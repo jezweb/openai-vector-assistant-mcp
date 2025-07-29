@@ -1,120 +1,314 @@
-# MCP Client Setup Guide
+# Universal MCP Client Setup Guide
 
-This guide provides step-by-step instructions for configuring and testing the OpenAI Vector Store MCP server with different MCP clients.
+This comprehensive guide provides step-by-step instructions for configuring and testing the Universal OpenAI Vector Store MCP server with different MCP clients across all three deployment options.
 
-## Server Information
+## 🌟 Universal MCP Server - Three Deployment Options
 
+Choose the deployment option that best fits your needs:
+
+### 📦 Option 1: NPM Package (Recommended)
+- **Package**: `openai-vector-store-mcp`
+- **Transport**: Direct stdio (fastest and most reliable)
+- **Setup**: Simple `npx` command
+- **Best for**: Most users, especially Roo users
+
+### ☁️ Option 2: Cloudflare Workers
 - **Production URL**: `https://mcp-server-cloudflare.webfonts.workers.dev`
-- **Authentication Pattern**: `/mcp/{openai-api-key}`
-- **Protocol Version**: MCP 2024-11-05
 - **Transport**: HTTP via `mcp-proxy`
+- **Setup**: Zero installation required
+- **Best for**: Users who prefer cloud deployment
 
-## Available Tools
+### 🔧 Option 3: Local Development
+- **Source**: Clone and build locally
+- **Transport**: HTTP (local server)
+- **Setup**: Full development environment
+- **Best for**: Developers and customization
 
-The server provides 4 vector store management tools:
+## 🛠️ Available Tools
 
-1. **vector-store-create** - Create a new vector store
-2. **vector-store-list** - List all vector stores
-3. **vector-store-get** - Get details of a specific vector store
-4. **vector-store-delete** - Delete a vector store
+All deployment options provide **15 comprehensive vector store management tools**:
+
+### Core Operations
+1. **vector-store-create** - Create a new vector store with metadata and expiration
+2. **vector-store-list** - List all vector stores with pagination
+3. **vector-store-get** - Get detailed information about a specific vector store
+4. **vector-store-delete** - Delete a vector store permanently
+5. **vector-store-modify** - Update vector store name, expiration, or metadata
+
+### File Management
+6. **vector-store-file-add** - Add an existing file to a vector store
+7. **vector-store-file-list** - List all files in a vector store with filtering
+8. **vector-store-file-get** - Get details of a specific file in a vector store
+9. **vector-store-file-content** - Retrieve the content of a file in a vector store
+10. **vector-store-file-update** - Update file metadata
+11. **vector-store-file-delete** - Remove a file from a vector store
+
+### Batch Operations
+12. **vector-store-file-batch-create** - Create a batch operation for multiple files
+13. **vector-store-file-batch-get** - Get the status of a batch operation
+14. **vector-store-file-batch-cancel** - Cancel a running batch operation
+15. **vector-store-file-batch-files** - List files in a batch operation
 
 ## Prerequisites
 
 1. **OpenAI API Key**: You need a valid OpenAI API key with access to the Assistants API
-2. **Node.js**: Required for the `mcp-proxy` package
-3. **MCP Client**: Either Claude Desktop or Roo
+2. **Node.js**: Version 18.0.0 or higher (required for NPM package and local development)
+3. **MCP Client**: Claude Desktop, Roo, or other MCP-compatible client
 
-## Claude Desktop Setup
+---
 
-### 1. Install Dependencies
+## 📦 Option 1: NPM Package Setup (Recommended)
 
-First, ensure you have the MCP proxy package installed globally:
+### Why Choose the NPM Package?
+- **Fastest Performance**: Direct stdio transport with no HTTP overhead
+- **Most Reliable**: No network dependencies or proxy servers
+- **Easiest for Roo**: Best integration with Roo's MCP implementation
+- **Simplest Setup**: No additional dependencies beyond Node.js
+
+### Installation
 
 ```bash
-npm install -g mcp-proxy
+# Option A: Use directly with npx (no installation required)
+npx openai-vector-store-mcp
+
+# Option B: Install globally for faster startup
+npm install -g openai-vector-store-mcp
+
+# Option C: Install locally in your project
+npm install openai-vector-store-mcp
 ```
 
-### 2. Locate Configuration File
+### Claude Desktop Configuration
 
-Find your Claude Desktop configuration file:
+Add to your Claude Desktop configuration file:
 
+**Configuration File Locations:**
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 - **Linux**: `~/.config/Claude/claude_desktop_config.json`
-
-### 3. Configure Claude Desktop
-
-Copy the contents of [`claude-desktop-config.json`](claude-desktop-config.json) to your Claude Desktop configuration file, or merge it with your existing configuration:
 
 ```json
 {
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": [
-        "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
-      ],
-      "env": {}
+      "args": ["openai-vector-store-mcp"],
+      "env": {
+        "OPENAI_API_KEY": "your-openai-api-key-here"
+      }
     }
   }
 }
 ```
 
-### 4. Update API Key
+### Roo Configuration
 
-Replace `YOUR_OPENAI_API_KEY_HERE` with your actual OpenAI API key.
-
-### 5. Restart Claude Desktop
-
-Close and restart Claude Desktop for the configuration to take effect.
-
-## Roo Setup
-
-### 1. Install Dependencies
-
-Ensure you have the MCP proxy package installed:
-
-```bash
-npm install -g mcp-proxy
-```
-
-### 2. Locate Configuration File
-
-Find your Roo configuration file (typically `~/.config/roo/config.json` or as specified in your Roo installation).
-
-### 3. Configure Roo
-
-Copy the contents of [`roo-config.json`](roo-config.json) to your Roo configuration file:
+Add to your Roo configuration file (typically `~/.config/roo/config.json`):
 
 ```json
 {
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": [
-        "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
-      ],
-      "env": {},
+      "args": ["openai-vector-store-mcp"],
+      "env": {
+        "OPENAI_API_KEY": "your-openai-api-key-here"
+      },
       "alwaysAllow": [
         "vector-store-create",
-        "vector-store-list", 
+        "vector-store-list",
         "vector-store-get",
-        "vector-store-delete"
+        "vector-store-delete",
+        "vector-store-modify",
+        "vector-store-file-add",
+        "vector-store-file-list",
+        "vector-store-file-get",
+        "vector-store-file-content",
+        "vector-store-file-update",
+        "vector-store-file-delete",
+        "vector-store-file-batch-create",
+        "vector-store-file-batch-get",
+        "vector-store-file-batch-cancel",
+        "vector-store-file-batch-files"
       ]
     }
   }
 }
 ```
 
-### 4. Update API Key
+---
 
-Replace `YOUR_OPENAI_API_KEY_HERE` with your actual OpenAI API key.
+## ☁️ Option 2: Cloudflare Workers Setup
 
-### 5. Restart Roo
+### Why Choose Cloudflare Workers?
+- **Zero Setup**: No local installation required
+- **Global Performance**: Deployed on Cloudflare's edge network
+- **Always Available**: 99.9% uptime with automatic scaling
+- **No Maintenance**: Fully managed cloud deployment
 
-Restart Roo for the configuration to take effect.
+### Prerequisites
+
+Install the MCP proxy package:
+
+```bash
+npm install -g mcp-proxy
+```
+
+### Claude Desktop Configuration
+
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": [
+        "mcp-proxy",
+        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+      ]
+    }
+  }
+}
+```
+
+### Roo Configuration
+
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": [
+        "mcp-proxy",
+        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+      ],
+      "alwaysAllow": [
+        "vector-store-create",
+        "vector-store-list",
+        "vector-store-get",
+        "vector-store-delete",
+        "vector-store-modify",
+        "vector-store-file-add",
+        "vector-store-file-list",
+        "vector-store-file-get",
+        "vector-store-file-content",
+        "vector-store-file-update",
+        "vector-store-file-delete",
+        "vector-store-file-batch-create",
+        "vector-store-file-batch-get",
+        "vector-store-file-batch-cancel",
+        "vector-store-file-batch-files"
+      ]
+    }
+  }
+}
+```
+
+---
+
+## 🔧 Option 3: Local Development Setup
+
+### Why Choose Local Development?
+- **Full Control**: Complete access to source code and customization
+- **Development**: Perfect for contributing or extending functionality
+- **Privacy**: All processing happens locally
+- **Customization**: Modify the server to fit specific needs
+
+### Setup Steps
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/jezweb/openai-vector-assistant-mcp.git
+cd openai-vector-assistant-mcp
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Set up environment variables:**
+```bash
+# Add your OpenAI API key to wrangler.toml or use wrangler secrets
+wrangler secret put OPENAI_API_KEY
+```
+
+4. **Start development server:**
+```bash
+npm run dev
+```
+
+### Configuration
+
+Use your local server URL (typically `http://localhost:8787`) in your MCP client configuration:
+
+**For Claude Desktop:**
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": [
+        "mcp-proxy",
+        "http://localhost:8787/mcp/YOUR_OPENAI_API_KEY_HERE"
+      ]
+    }
+  }
+}
+```
+
+**For Roo:**
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": [
+        "mcp-proxy",
+        "http://localhost:8787/mcp/YOUR_OPENAI_API_KEY_HERE"
+      ],
+      "alwaysAllow": [
+        "vector-store-create",
+        "vector-store-list",
+        "vector-store-get",
+        "vector-store-delete",
+        "vector-store-modify",
+        "vector-store-file-add",
+        "vector-store-file-list",
+        "vector-store-file-get",
+        "vector-store-file-content",
+        "vector-store-file-update",
+        "vector-store-file-delete",
+        "vector-store-file-batch-create",
+        "vector-store-file-batch-get",
+        "vector-store-file-batch-cancel",
+        "vector-store-file-batch-files"
+      ]
+    }
+  }
+}
+```
+
+---
+
+## 🔄 Configuration Notes
+
+### Important Setup Steps
+
+1. **Replace API Key**: Always replace `YOUR_OPENAI_API_KEY_HERE` with your actual OpenAI API key
+2. **Restart Client**: Restart your MCP client after configuration changes
+3. **Roo Users**: The `alwaysAllow` array is crucial for Roo to automatically approve tool usage
+4. **Security**: Never commit your API key to version control
+
+### Choosing the Right Option
+
+| Feature | NPM Package | Cloudflare Workers | Local Development |
+|---------|-------------|-------------------|-------------------|
+| **Setup Complexity** | Simple | Simple | Moderate |
+| **Performance** | Fastest | Fast | Fast |
+| **Reliability** | Highest | High | Depends on setup |
+| **Customization** | Limited | None | Full |
+| **Maintenance** | Minimal | None | Self-managed |
+| **Best for** | Most users, Roo | Zero-setup needs | Developers |
 
 ## Testing the Integration
 
@@ -296,3 +490,328 @@ If you continue to experience issues:
 4. Verify deletion was successful
 
 This completes the setup and testing guide for the OpenAI Vector Store MCP server integration.
+
+## 🧪 Testing the Integration
+
+### Basic Connectivity Test
+
+Once configured, test the integration with these comprehensive steps:
+
+#### 1. Check Server Connection
+
+Ask your MCP client to list available tools. You should see **all 15 vector store tools** listed.
+
+**Example request**: "What MCP tools are available?"
+
+**Expected response**: The client should list all 15 vector store tools including core operations, file management, and batch operations.
+
+#### 2. Test Core Operations
+
+**List existing vector stores:**
+```
+"List my vector stores"
+```
+
+**Create a test vector store:**
+```
+"Create a vector store named 'Test Store' that expires in 1 day with metadata purpose: testing"
+```
+
+**Get vector store details:**
+```
+"Get details of vector store [ID from previous step]"
+```
+
+**Modify the vector store:**
+```
+"Update vector store [ID] to expire in 7 days and change name to 'Updated Test Store'"
+```
+
+#### 3. Test File Operations
+
+**Add a file to the vector store:**
+```
+"Add file [file-id] to vector store [vector-store-id]"
+```
+
+**List files in the vector store:**
+```
+"List all files in vector store [vector-store-id]"
+```
+
+**Get file details:**
+```
+"Get details of file [file-id] in vector store [vector-store-id]"
+```
+
+**Get file content:**
+```
+"Get the content of file [file-id] in vector store [vector-store-id]"
+```
+
+#### 4. Test Batch Operations
+
+**Create a batch operation:**
+```
+"Create a batch to add files [file-1], [file-2], [file-3] to vector store [vector-store-id]"
+```
+
+**Check batch status:**
+```
+"Get status of batch [batch-id] in vector store [vector-store-id]"
+```
+
+**List files in batch:**
+```
+"List files in batch [batch-id] for vector store [vector-store-id]"
+```
+
+#### 5. Clean Up
+
+**Delete the test vector store:**
+```
+"Delete vector store [ID from creation step]"
+```
+
+### Advanced Testing
+
+#### Performance Testing
+
+Test different deployment options for performance:
+
+1. **NPM Package**: Should have the fastest response times (direct stdio)
+2. **Cloudflare Workers**: Should have consistent sub-100ms responses
+3. **Local Development**: Response times depend on local setup
+
+#### Concurrent Operations
+
+Test multiple operations in sequence:
+
+1. Create multiple vector stores with different configurations
+2. List all vector stores and verify pagination
+3. Add multiple files to different vector stores
+4. Create batch operations for bulk file management
+5. Get details of specific stores and files
+6. Delete selected stores and verify cleanup
+
+#### Error Handling
+
+Test error scenarios across all tools:
+
+1. **Invalid IDs**: Try to get non-existent vector store or file IDs
+2. **Already Deleted**: Try to delete an already deleted vector store
+3. **Invalid Parameters**: Create vector stores with invalid expiration dates
+4. **Permission Issues**: Test with invalid API keys
+5. **Rate Limiting**: Test rapid successive calls
+
+## 🛠️ Troubleshooting
+
+### Common Issues by Deployment Option
+
+#### NPM Package Issues
+
+**"OPENAI_API_KEY environment variable is required"**
+```bash
+# Set environment variable in configuration
+export OPENAI_API_KEY="your-key"
+
+# Or add to your MCP client configuration
+"env": {
+  "OPENAI_API_KEY": "your-openai-api-key-here"
+}
+```
+
+**"Command not found: openai-vector-store-mcp"**
+```bash
+# Install the package globally
+npm install -g openai-vector-store-mcp
+
+# Or use npx directly
+npx openai-vector-store-mcp
+```
+
+**"Node.js version too old"**
+```bash
+# Check Node.js version (requires 18+)
+node --version
+
+# Update Node.js if needed
+nvm install 18
+nvm use 18
+```
+
+#### Cloudflare Workers Issues
+
+**"Server not found" or "Connection failed"**
+```bash
+# Test the server directly
+curl -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+
+# Install mcp-proxy if missing
+npm install -g mcp-proxy
+```
+
+**"Authentication failed"**
+- Verify your OpenAI API key is correct and has Assistants API access
+- Ensure the API key is properly embedded in the URL
+- Check for extra spaces or characters in the API key
+
+#### Local Development Issues
+
+**"Server not running"**
+```bash
+# Start the development server
+npm run dev
+
+# Check if server is accessible
+curl -X POST "http://localhost:8787/mcp/YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+```
+
+**"Dependencies not installed"**
+```bash
+# Install all dependencies
+npm install
+
+# Build the project
+npm run build
+```
+
+### Client-Specific Issues
+
+#### Claude Desktop
+
+**"MCP server failed to start"**
+```bash
+# Check Claude Desktop logs (macOS)
+tail -f ~/Library/Logs/Claude/claude_desktop.log
+
+# Verify configuration file syntax
+cat ~/Library/Application\ Support/Claude/claude_desktop_config.json | python -m json.tool
+```
+
+**"Tools not appearing"**
+- Restart Claude Desktop after configuration changes
+- Verify the configuration file is in the correct location
+- Check that the JSON syntax is valid
+
+#### Roo
+
+**"Permission denied" or constant approval prompts**
+- Ensure all 15 tools are listed in the `alwaysAllow` array
+- Use exact tool names as listed in the documentation
+- Restart Roo after configuration changes
+
+**"Tool names not recognized"**
+```json
+"alwaysAllow": [
+  "vector-store-create",
+  "vector-store-list",
+  "vector-store-get",
+  "vector-store-delete",
+  "vector-store-modify",
+  "vector-store-file-add",
+  "vector-store-file-list",
+  "vector-store-file-get",
+  "vector-store-file-content",
+  "vector-store-file-update",
+  "vector-store-file-delete",
+  "vector-store-file-batch-create",
+  "vector-store-file-batch-get",
+  "vector-store-file-batch-cancel",
+  "vector-store-file-batch-files"
+]
+```
+
+### Platform-Specific Debugging
+
+#### macOS
+```bash
+# Install Node.js via Homebrew
+brew install node
+
+# Check configuration file location
+ls -la ~/Library/Application\ Support/Claude/
+
+# View logs
+tail -f ~/Library/Logs/Claude/claude_desktop.log
+```
+
+#### Windows
+```bash
+# Check configuration file location
+dir %APPDATA%\Claude\
+
+# Set environment variable permanently
+setx OPENAI_API_KEY "your-key-here"
+```
+
+#### Linux
+```bash
+# Install Node.js (Ubuntu/Debian)
+sudo apt update && sudo apt install nodejs npm
+
+# Check configuration file location
+ls -la ~/.config/Claude/
+
+# View system logs
+journalctl -f
+```
+
+### Debug Mode
+
+#### NPM Package Debug
+```bash
+DEBUG=* OPENAI_API_KEY="your-key" npx openai-vector-store-mcp
+```
+
+#### Cloudflare Workers Debug
+```bash
+# Test with verbose curl output
+curl -v -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+```
+
+#### Local Development Debug
+```bash
+# Start with debug logging
+DEBUG=* npm run dev
+
+# Check server logs
+tail -f logs/server.log
+```
+
+### Getting Help
+
+1. **Check Documentation**: Review the [Universal MCP Server Guide](UNIVERSAL-MCP-SERVER-GUIDE.md)
+2. **Test Isolation**: Test each component separately (API key, server, client)
+3. **Configuration Validation**: Use JSON validators for configuration files
+4. **Community Support**: Check the [main repository](https://github.com/jezweb/openai-vector-assistant-mcp) for issues and discussions
+5. **Performance Comparison**: Try different deployment options to identify the best fit
+
+### Migration Between Options
+
+#### From Cloudflare Workers to NPM Package
+1. Remove `mcp-proxy` from configuration
+2. Update configuration to use direct stdio transport
+3. Add environment variable for API key
+4. Test the new configuration
+
+#### From NPM Package to Cloudflare Workers
+1. Install `mcp-proxy`: `npm install -g mcp-proxy`
+2. Update configuration to use proxy with Cloudflare Workers URL
+3. Embed API key in the URL
+4. Test the new configuration
+
+#### From Local Development to Production
+1. Choose between NPM package or Cloudflare Workers
+2. Update configuration accordingly
+3. Test thoroughly before switching permanently
+
+---
+
+This completes the Universal MCP Client Setup Guide. Choose the deployment option that best fits your needs and follow the corresponding setup instructions for your MCP client.

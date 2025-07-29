@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": ["openai-vector-store-mcp"],
+      "env": {
+        "OPENAI_API_KEY": "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"
+      },
+      "alwaysAllow": [
+        "vector-store-create",
+        "vector-store-list", 
+        "vector-store-get",
+        "vector-store-delete",
+        "vector-store-modify",
+        "vector-store-file-add",
+        "vector-store-file-list",
+        "vector-store-file-get",
+        "vector-store-file-content",
+        "vector-store-file-update",
+        "vector-store-file-delete",
+        "vector-store-file-batch-create",
+        "vector-store-file-batch-get",
+        "vector-store-file-batch-cancel",
+        "vector-store-file-batch-files"
+      ]
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "mcpServers": {
+    "universal-openai-vector-store": {
+      "command": "node",
+      "args": ["/home/jez/Desktop/mcp-server-project/universal-mcp-server.cjs"],
+      "env": {
+        "OPENAI_API_KEY": "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",
+        "DEBUG": "true",
+        "NODE_ENV": "production"
+      },
+      "alwaysAllow": [
+        "vector-store-create",
+        "vector-store-list", 
+        "vector-store-get",
+        "vector-store-delete",
+        "vector-store-modify",
+        "vector-store-file-add",
+        "vector-store-file-list",
+        "vector-store-file-get",
+        "vector-store-file-content",
+        "vector-store-file-update",
+        "vector-store-file-delete",
+        "vector-store-file-batch-create",
+        "vector-store-file-batch-get",
+        "vector-store-file-batch-cancel",
+        "vector-store-file-batch-files"
+      ]
+    }
+  },
+  "_metadata": {
+    "description": "Universal MCP server configuration compatible with any MCP client",
+    "version": "1.0.0",
+    "created": "2025-07-29",
+    "features": [
+      "Proper JSON-RPC 2.0 formatting with UTF-8 encoding",
+      "Newline-delimited messages without embedded newlines",
+      "Correct initialization handshake sequence",
+      "Empty line handshake handling",
+      "Immediate server info notification",
+      "Proper error handling and crash prevention",
+      "Stdout line-buffering for maximum compatibility",
+      "Environment variable validation",
+      "Debug logging capabilities",
+      "Universal MCP client compatibility"
+    ],
+    "compatible_clients": [
+      "Roo",
+      "Claude Desktop",
+      "Cursor",
+      "Windsurf",
+      "Any MCP-compliant client"
+    ],
+    "debugging": {
+      "enable_debug": "Set DEBUG=true in environment",
+      "log_location": "stderr (does not interfere with stdout MCP protocol)",
+      "test_command": "node test-universal-mcp-server.cjs"
+    },
+    "fallback_transport": {
+      "description": "SSE transport configuration as alternative",
+      "sse_endpoint": "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/sse",
+      "proxy_command": "npx mcp-proxy https://mcp-server-cloudflare.webfonts.workers.dev/mcp/sse"
+    }
+  }
+}

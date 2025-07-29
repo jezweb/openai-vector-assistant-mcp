@@ -1,0 +1,39 @@
+{
+  "name": "openai-vector-store-mcp",
+  "version": "1.1.0",
+  "description": "Universal OpenAI Vector Store MCP Server with stdio transport - 15 comprehensive tools, enhanced Roo compatibility, and direct stdio performance",
+  "main": "universal-mcp-server.cjs",
+  "type": "commonjs",
+  "bin": {
+    "openai-vector-store-mcp": "./universal-mcp-server.cjs"
+  },
+  "scripts": {
+    "start": "node universal-mcp-server.cjs",
+    "test": "node test/test-stdio.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "openai",
+    "vector-store",
+    "stdio",
+    "claude-desktop",
+    "roo",
+    "universal",
+    "typescript",
+    "batch-operations",
+    "file-management",
+    "assistants-api"
+  ],
+  "author": "Universal MCP Server Team",
+  "license": "MIT",
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "universal-mcp-server.cjs",
+    "openai-service.cjs",
+    "README.md"
+  ]
+}

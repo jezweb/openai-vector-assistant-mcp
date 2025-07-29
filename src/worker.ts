@@ -41,15 +41,6 @@ export default {
       }
 
       const apiKey = pathMatch[1];
-      
-      // Validate that we have an OpenAI API key in environment
-      if (!env.OPENAI_API_KEY) {
-        return createErrorResponse(
-          ErrorCodes.INTERNAL_ERROR,
-          'OpenAI API key not configured',
-          500
-        );
-      }
 
       // Only allow POST requests for MCP
       if (request.method !== 'POST') {

@@ -1,7 +1,7 @@
 {
-  "name": "mcp-server-cloudflare",
-  "version": "1.0.0",
-  "description": "MCP Server running on Cloudflare Workers",
+  "name": "universal-openai-vector-store-mcp",
+  "version": "1.1.0",
+  "description": "Universal OpenAI Vector Store MCP Server - Deploy via Cloudflare Workers, NPM package, or local development. Complete 15-tool coverage with enhanced Roo compatibility.",
   "main": "dist/worker.js",
   "type": "module",
   "scripts": {
@@ -15,10 +15,17 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
+    "openai",
+    "vector-store",
     "cloudflare-workers",
-    "serverless"
+    "serverless",
+    "universal",
+    "roo",
+    "claude-desktop",
+    "stdio",
+    "typescript"
   ],
-  "author": "",
+  "author": "Universal MCP Server Team",
   "license": "MIT",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0",
