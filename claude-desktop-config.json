@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": [
+        "mcp-proxy",
+        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+      ],
+      "env": {}
+    }
+  }
+}

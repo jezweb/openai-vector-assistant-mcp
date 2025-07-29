@@ -1,0 +1,36 @@
+name = "mcp-server-cloudflare"
+main = "src/worker.ts"
+compatibility_date = "2024-12-06"
+compatibility_flags = ["nodejs_compat"]
+account_id = "0460574641fdbb98159c98ebf593e2bd"
+
+# Memory and CPU limits
+limits = { cpu_ms = 50 }
+
+# Environment variables (add your OpenAI API key here)
+# For production, use: wrangler secret put OPENAI_API_KEY
+[vars]
+# OPENAI_API_KEY = "your-openai-api-key-here"
+
+# Development environment
+[env.development]
+name = "mcp-server-cloudflare-dev"
+vars = { ENVIRONMENT = "development" }
+
+# Staging environment
+[env.staging]
+name = "mcp-server-cloudflare-staging"
+vars = { ENVIRONMENT = "staging" }
+
+# Production environment
+[env.production]
+name = "mcp-server-cloudflare-prod"
+vars = { ENVIRONMENT = "production" }
+
+# Build configuration
+[build]
+command = "npm run type-check"
+
+# Deployment configuration
+[triggers]
+crons = []
