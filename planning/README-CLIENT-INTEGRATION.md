@@ -27,7 +27,7 @@ This directory contains ready-to-use configuration files and documentation for i
 
 ## Server Details
 
-- **Production URL**: `https://mcp-server-cloudflare.webfonts.workers.dev`
+- **Production URL**: `https://vectorstore.jezweb.com`
 - **Authentication**: `/mcp/{openai-api-key}`
 - **Protocol**: MCP 2024-11-05
 - **Transport**: HTTP via `@modelcontextprotocol/server-fetch`

@@ -7,7 +7,7 @@ A production-ready Model Context Protocol (MCP) server that provides comprehensi
 Choose the deployment option that best fits your needs:
 
 ### 🚀 Option 1: Cloudflare Workers (Production Ready)
-**Production URL**: `https://mcp-server-cloudflare.webfonts.workers.dev`
+**Production URL**: `https://vectorstore.jezweb.com`
 - ✅ Zero setup required
 - ✅ Global edge distribution
 - ✅ Sub-100ms response times
@@ -29,22 +29,25 @@ Choose the deployment option that best fits your needs:
 
 ## ✨ Features
 
-- **15 Vector Store Tools** - Complete coverage of OpenAI's Vector Store API
+- **21 Comprehensive Tools** - Complete file-to-vector-store workflow with OpenAI's APIs
+- **File Upload Capabilities** - Direct file upload from local filesystem to OpenAI
 - **Production Ready** - Deployed on Cloudflare Workers with global edge distribution
 - **Zero Dependencies** - Lightweight implementation with no runtime dependencies
 - **Type Safe** - Full TypeScript implementation with comprehensive type definitions
 - **Secure Authentication** - URL-based API key authentication
 - **Error Handling** - Robust error handling with detailed error messages
 - **CORS Support** - Ready for web-based MCP clients
+- **Large File Support** - Multipart uploads for files up to 512MB
 
 ## 📊 Current Status
 
-✅ **Phase 1 Complete** - All 15 tools implemented and tested  
-✅ **Production Deployment** - Live on Cloudflare Workers  
-✅ **Client Integration** - Working with Claude Desktop and Roo  
-✅ **Comprehensive Testing** - All tools validated and functional  
+✅ **Phase 2 v1.2.0 Complete** - Complete file-to-vector-store workflow with 21 tools
+✅ **Production Deployment** - Live on Cloudflare Workers with global edge distribution
+✅ **Client Integration** - Working with Claude Desktop, Roo, and all MCP clients
+✅ **End-to-End Workflow** - Upload files directly from local filesystem to vector stores
+✅ **Real-World Ready** - Solves the 470 PDF files scenario and similar use cases
 
-## 🛠️ Available Tools
+## 🛠️ Available Tools (21 Total)
 
 ### Core Vector Store Operations
 1. **vector-store-create** - Create a new vector store with optional expiration and metadata
@@ -53,19 +56,27 @@ Choose the deployment option that best fits your needs:
 4. **vector-store-delete** - Delete a vector store permanently
 5. **vector-store-modify** - Update vector store name, expiration, or metadata
 
-### File Management Operations
-6. **vector-store-file-add** - Add an existing file to a vector store
-7. **vector-store-file-list** - List all files in a vector store with filtering
-8. **vector-store-file-get** - Get details of a specific file in a vector store
-9. **vector-store-file-content** - Retrieve the content of a file in a vector store
-10. **vector-store-file-update** - Update file metadata
-11. **vector-store-file-delete** - Remove a file from a vector store
+### 🆕 File Upload & Management Operations (Phase 2)
+6. **file-upload** - Upload local files directly to OpenAI (CRITICAL - enables end-to-end workflow)
+7. **file-list** - List all uploaded files with filtering and pagination
+8. **file-get** - Get detailed information about specific files
+9. **file-delete** - Remove files from OpenAI storage
+10. **file-content** - Download and retrieve file content
+11. **upload-create** - Create multipart uploads for large files (>25MB)
+
+### Vector Store File Operations
+12. **vector-store-file-add** - Add an existing file to a vector store
+13. **vector-store-file-list** - List all files in a vector store with filtering
+14. **vector-store-file-get** - Get details of a specific file in a vector store
+15. **vector-store-file-content** - Retrieve the content of a file in a vector store
+16. **vector-store-file-update** - Update file metadata
+17. **vector-store-file-delete** - Remove a file from a vector store
 
 ### Batch Operations
-12. **vector-store-file-batch-create** - Create a batch operation for multiple files
-13. **vector-store-file-batch-get** - Get the status of a batch operation
-14. **vector-store-file-batch-cancel** - Cancel a running batch operation
-15. **vector-store-file-batch-files** - List files in a batch operation
+18. **vector-store-file-batch-create** - Create a batch operation for multiple files
+19. **vector-store-file-batch-get** - Get the status of a batch operation
+20. **vector-store-file-batch-cancel** - Cancel a running batch operation
+21. **vector-store-file-batch-files** - List files in a batch operation
 
 ## 🚀 Quick Start - Choose Your Installation Method
 
@@ -75,6 +86,37 @@ Choose the deployment option that best fits your needs:
 - Node.js 18+ (for NPM package or local development)
 - MCP client (Claude Desktop, Roo, or other MCP-compatible client)
 
+### 🔑 Getting Started with OpenAI
+
+Before using this MCP server, you'll need to set up your OpenAI account and API access:
+
+#### 1. **Get Your OpenAI API Key**
+- Visit the [OpenAI API Keys page](https://platform.openai.com/api-keys)
+- Create a new API key or use an existing one
+- Copy your API key (starts with `sk-proj-` or `sk-`)
+
+#### 2. **Check Your Vector Store Dashboard**
+- Monitor your vector stores at [OpenAI Storage Dashboard](https://platform.openai.com/storage)
+- View usage, file counts, and storage limits
+- Track vector store expiration dates
+
+#### 3. **Verify Assistants API Access**
+- Ensure your account has access to the Assistants API
+- Check your [OpenAI Usage Dashboard](https://platform.openai.com/usage) for API limits
+- Review [OpenAI Pricing](https://openai.com/pricing) for vector store costs
+
+#### 4. **Understand Vector Store Limits**
+- **Free Tier**: Limited vector store usage
+- **Paid Tier**: Higher limits based on your plan
+- **File Limits**: Each vector store can contain up to 10,000 files
+- **Storage Limits**: Check your account's storage quota
+
+#### 📚 **Helpful OpenAI Resources**
+- [Vector Stores Documentation](https://platform.openai.com/docs/assistants/tools/file-search)
+- [Assistants API Guide](https://platform.openai.com/docs/assistants/overview)
+- [File Upload Documentation](https://platform.openai.com/docs/api-reference/files)
+- [OpenAI Community Forum](https://community.openai.com/)
+
 ---
 
 ## 📦 Option 1: NPM Package (Recommended for Most Users)
@@ -82,15 +124,20 @@ Choose the deployment option that best fits your needs:
 ### Installation
 
 ```bash
-# Option A: Use directly with npx (no installation required)
-npx openai-vector-store-mcp
+# Option A: Use directly with npx (recommended for latest fixes)
+npx openai-vector-store-mcp@latest
 
 # Option B: Install globally
-npm install -g openai-vector-store-mcp
+npm install -g openai-vector-store-mcp@latest
 
 # Option C: Install locally in your project
-npm install openai-vector-store-mcp
+npm install openai-vector-store-mcp@latest
 ```
+
+**💡 Why use @latest?**
+- Ensures you get the most recent bug fixes and improvements
+- Bypasses NPM cache issues that can cause outdated versions
+- Recommended for most reliable experience
 
 ### Claude Desktop Configuration
 
@@ -101,7 +148,7 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": ["openai-vector-store-mcp"],
+      "args": ["openai-vector-store-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key-here"
       }
@@ -119,7 +166,7 @@ Add to your Roo configuration file:
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": ["openai-vector-store-mcp"],
+      "args": ["openai-vector-store-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key-here"
       },
@@ -129,6 +176,12 @@ Add to your Roo configuration file:
         "vector-store-get",
         "vector-store-delete",
         "vector-store-modify",
+        "file-upload",
+        "file-list",
+        "file-get",
+        "file-delete",
+        "file-content",
+        "upload-create",
         "vector-store-file-add",
         "vector-store-file-list",
         "vector-store-file-get",
@@ -144,6 +197,67 @@ Add to your Roo configuration file:
   }
 }
 ```
+
+---
+
+## 🖥️ Claude Code CLI Configuration
+
+For users of Claude Code (CLI), you can add the MCP server using the command line interface:
+
+### Basic Setup
+
+```bash
+# Add the MCP server with local scope (default - available only in current project)
+claude mcp add openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+
+# Add with project scope (shared with team via .mcp.json file)
+claude mcp add --scope project openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+
+# Add with user scope (available across all your projects)
+claude mcp add --scope user openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+```
+
+### Scope Options
+
+- **`--scope local`** (default): Available only to you in the current project
+- **`--scope project`**: Shared with everyone in the project via `.mcp.json` file
+- **`--scope user`**: Available to you across all projects
+
+### Managing MCP Servers
+
+```bash
+# List all configured servers
+claude mcp list
+
+# Get details for the server
+claude mcp get openai-vector-store
+
+# Remove the server
+claude mcp remove openai-vector-store
+
+# Check server status within Claude Code
+/mcp
+```
+
+### Project-Level Configuration (.mcp.json)
+
+When using `--scope project`, Claude Code creates a `.mcp.json` file in your project root:
+
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": ["openai-vector-store-mcp@latest"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+**Environment Variable Expansion**: Claude Code supports `${VAR}` syntax for environment variables in `.mcp.json` files.
 
 ---
 
@@ -164,7 +278,7 @@ npm install -g mcp-proxy
       "command": "npx",
       "args": [
         "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+        "https://vectorstore.jezweb.com/mcp/YOUR_OPENAI_API_KEY_HERE"
       ]
     }
   }
@@ -186,7 +300,7 @@ npm install -g mcp-proxy
       "command": "npx",
       "args": [
         "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+        "https://vectorstore.jezweb.com/mcp/YOUR_OPENAI_API_KEY_HERE"
       ],
       "alwaysAllow": [
         "vector-store-create",
@@ -194,6 +308,12 @@ npm install -g mcp-proxy
         "vector-store-get",
         "vector-store-delete",
         "vector-store-modify",
+        "file-upload",
+        "file-list",
+        "file-get",
+        "file-delete",
+        "file-content",
+        "upload-create",
         "vector-store-file-add",
         "vector-store-file-list",
         "vector-store-file-get",
@@ -264,6 +384,75 @@ Use the local server URL in your MCP client configuration, replacing the Cloudfl
 
 ## 📖 Usage Examples
 
+### 🆕 Complete End-to-End Workflow (Phase 2 v1.2.0)
+
+**The Problem Solved**: Previously, users had to manually upload files to OpenAI before using vector store tools. Now you can upload files directly from your local filesystem!
+
+#### Basic Workflow
+```
+# 1. Upload a local file to OpenAI
+"Upload the file ./documents/report.pdf to OpenAI"
+
+# 2. Create a vector store for the uploaded files
+"Create a vector store named 'Project Documents' that expires in 7 days"
+
+# 3. Add the uploaded file to the vector store
+"Add file file-abc123 to vector store vs_def456"
+
+# 4. Now you can query the documents using OpenAI's Assistants API!
+```
+
+#### Real-World Example: Processing 470 PDF Files
+```
+# Upload multiple files from a directory
+"Upload all PDF files from ./research-papers/ to OpenAI"
+
+# Create a dedicated vector store
+"Create a vector store named 'Research Papers Collection' that expires in 30 days"
+
+# Batch add all uploaded files to the vector store
+"Create a batch to add all uploaded PDF files to the Research Papers Collection vector store"
+
+# Monitor batch processing
+"Get the status of the batch operation"
+
+# Query your knowledge base
+"Search for papers about machine learning in the Research Papers Collection"
+```
+
+#### Advanced Workflow: Large File Handling
+```
+# For files larger than 25MB, use multipart upload
+"Create a multipart upload for the file ./large-dataset.zip"
+
+# Upload the large file in chunks
+"Upload the large file ./large-dataset.zip using multipart upload"
+
+# Add to vector store once upload completes
+"Add the uploaded large file to vector store vs_def456"
+```
+
+### File Upload & Management
+
+```
+# Upload local files
+"Upload the file ./data/research.txt to OpenAI"
+"Upload all PDF files from ./documents/ to OpenAI"
+
+# List uploaded files
+"List all my uploaded files"
+"List files uploaded in the last 7 days"
+
+# Get file information
+"Get details of file file-abc123"
+
+# Download file content
+"Get the content of file file-abc123"
+
+# Delete files
+"Delete file file-abc123 from OpenAI"
+```
+
 ### Basic Vector Store Management
 
 ```
@@ -280,7 +469,7 @@ Use the local server URL in your MCP client configuration, replacing the Cloudfl
 "Delete vector store vs_abc123"
 ```
 
-### File Operations
+### Vector Store File Operations
 
 ```
 # Add a file to a vector store
@@ -289,7 +478,7 @@ Use the local server URL in your MCP client configuration, replacing the Cloudfl
 # List files in a vector store
 "List all files in vector store vs_def456"
 
-# Get file content
+# Get file content from vector store
 "Get the content of file file-abc123 in vector store vs_def456"
 ```
 
@@ -301,6 +490,100 @@ Use the local server URL in your MCP client configuration, replacing the Cloudfl
 
 # Check batch status
 "Get status of batch batch_abc123 in vector store vs_def456"
+```
+
+### Real-World Use Cases
+
+#### 📄 Document Processing Pipeline
+```
+# Legal Document Analysis
+1. "Upload all PDF files from ./legal-documents/ to OpenAI"
+2. "Create a vector store named 'Legal Document Analysis' that expires in 90 days"
+3. "Create a batch to add all uploaded legal documents to the vector store"
+4. "Monitor batch processing status until complete"
+5. "Search for clauses about liability in the legal documents"
+6. "Find all references to termination conditions"
+
+# Academic Research Processing
+1. "Upload ./research-papers/paper1.pdf to OpenAI"
+2. "Upload ./research-papers/paper2.pdf to OpenAI"
+3. "Create a vector store named 'Literature Review' with metadata for project tracking"
+4. "Add both uploaded papers to the Literature Review vector store"
+5. "Query the papers for methodology comparisons"
+```
+
+#### 💻 Code Analysis Workflow
+```
+# Codebase Documentation and Analysis
+1. "Upload all Python files from ./src/ to OpenAI"
+2. "Upload all JavaScript files from ./frontend/ to OpenAI"
+3. "Create a vector store named 'Codebase Analysis' that expires in 14 days"
+4. "Batch add all uploaded source files to the codebase vector store"
+5. "Find all functions that handle user authentication"
+6. "Search for security-related code patterns"
+7. "Identify API endpoints and their documentation"
+
+# Code Review Preparation
+1. "Upload changed files from ./src/modified/ to OpenAI"
+2. "Add uploaded files to existing 'Code Review' vector store"
+3. "Search for similar code patterns in the existing codebase"
+```
+
+#### 📚 Knowledge Base Creation
+```
+# Company Documentation System
+1. "Upload all documentation files from ./company-docs/ to OpenAI"
+2. "Upload policy files from ./policies/ to OpenAI"
+3. "Create a vector store named 'Company Knowledge Base' that expires in 365 days"
+4. "Create a batch operation to add all documentation to the knowledge base"
+5. "Monitor batch processing and handle any failed uploads"
+6. "Query the knowledge base for HR policies"
+7. "Search for specific procedures and guidelines"
+
+# Customer Support Knowledge Base
+1. "Upload FAQ documents from ./support-docs/ to OpenAI"
+2. "Upload troubleshooting guides from ./troubleshooting/ to OpenAI"
+3. "Create a vector store named 'Support Knowledge Base'"
+4. "Add all support documents to the vector store"
+5. "Search for solutions to specific customer issues"
+```
+
+#### 🔬 Research and Analysis
+```
+# Market Research Analysis
+1. "Upload market reports from ./market-research/ to OpenAI"
+2. "Upload competitor analysis from ./competitor-data/ to OpenAI"
+3. "Create a vector store named 'Market Intelligence' with expiration in 180 days"
+4. "Batch add all research documents to the vector store"
+5. "Search for market trends and opportunities"
+6. "Compare competitor strategies across documents"
+
+# Scientific Literature Review
+1. "Upload research papers from ./literature/ to OpenAI"
+2. "Create a vector store named 'Literature Review 2024'"
+3. "Add papers to vector store with metadata tracking"
+4. "Search for specific methodologies across papers"
+5. "Find contradictory findings in the literature"
+```
+
+#### 📊 Data Processing Workflows
+```
+# Large Dataset Processing (470 PDF Scenario)
+1. "List all PDF files in ./research-collection/ directory"
+2. "Upload all 470 PDF files from ./research-collection/ to OpenAI"
+3. "Create a vector store named 'Comprehensive Research Database'"
+4. "Create batch operations to add files in groups of 50"
+5. "Monitor all batch operations until completion"
+6. "Verify all 470 files are successfully added to vector store"
+7. "Search across entire collection for specific research topics"
+8. "Generate summaries of key findings across all documents"
+
+# Content Management System
+1. "Upload articles from ./content/articles/ to OpenAI"
+2. "Upload blog posts from ./content/blog/ to OpenAI"
+3. "Create vector stores for different content categories"
+4. "Organize content by topic using separate vector stores"
+5. "Search for content gaps and opportunities"
 ```
 
 ## 🏗️ Architecture
@@ -339,12 +622,12 @@ Test the server directly with curl:
 
 ```bash
 # List available tools
-curl -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 
 # Create a vector store
-curl -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
@@ -451,23 +734,91 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🆘 Troubleshooting & Support
 
+### @latest Package Issues
+
+#### NPM Cache Problems
+If you're experiencing issues with outdated versions, use `@latest` to bypass cache:
+
+```bash
+# Clear NPM cache and use @latest
+npm cache clean --force
+npx openai-vector-store-mcp@latest
+
+# For global installations
+npm uninstall -g openai-vector-store-mcp
+npm install -g openai-vector-store-mcp@latest
+```
+
+#### Version Conflicts
+```bash
+# Check current version
+npx openai-vector-store-mcp@latest --version
+
+# Force latest version in configuration
+# Update your config to use @latest instead of version numbers
+```
+
+### Client-Specific Troubleshooting
+
+#### Claude Desktop Issues
+
+**Configuration file issues:**
+```bash
+# Verify configuration file syntax
+cat ~/Library/Application\ Support/Claude/claude_desktop_config.json | python -m json.tool
+
+# Ensure @latest is used in args
+"args": ["openai-vector-store-mcp@latest"]
+```
+
+#### Claude Code CLI Issues
+
+**Server not connecting:**
+```bash
+# Check server status
+claude mcp list
+claude mcp get openai-vector-store
+
+# Re-add with @latest
+claude mcp remove openai-vector-store
+claude mcp add openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-key"
+```
+
+**Scope-related issues:**
+```bash
+# Check which scope the server is in
+claude mcp list
+
+# Add to correct scope
+claude mcp add --scope user openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-key"
+```
+
+**Project .mcp.json issues:**
+```bash
+# Reset project choices if needed
+claude mcp reset-project-choices
+
+# Verify .mcp.json syntax
+cat .mcp.json | python -m json.tool
+```
+
 ### Common Connection Issues
 
 #### 1. "Server not found" or "Connection failed"
 
 **For NPM Package Users:**
 ```bash
-# Verify the package is installed
-npm list -g openai-vector-store-mcp
+# Always use @latest for most reliable experience
+npx openai-vector-store-mcp@latest
 
 # Test the server directly
-OPENAI_API_KEY="your-key" npx openai-vector-store-mcp
+OPENAI_API_KEY="your-key" npx openai-vector-store-mcp@latest
 ```
 
 **For Cloudflare Workers Users:**
 ```bash
 # Test the server directly
-curl -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 ```
@@ -500,13 +851,14 @@ curl -X POST "http://localhost:8787/mcp/YOUR_API_KEY" \
 #### 4. Roo-Specific Issues
 
 **"Permission denied" errors:**
-- Ensure `alwaysAllow` is configured for all 15 tools
+- Ensure `alwaysAllow` is configured for all 21 tools
 - Check that tool names in `alwaysAllow` match exactly
 - Restart Roo after configuration changes
 
 **Tool approval prompts:**
 - Add all tool names to the `alwaysAllow` array
 - Use the exact tool names as listed in the documentation
+- Include the new Phase 2 file management tools: `file-upload`, `file-list`, `file-get`, `file-delete`, `file-content`, `upload-create`
 
 ### Platform-Specific Setup
 
@@ -515,8 +867,8 @@ curl -X POST "http://localhost:8787/mcp/YOUR_API_KEY" \
 # Install Node.js if not present
 brew install node
 
-# Install the MCP package
-npm install -g openai-vector-store-mcp
+# Install the MCP package with @latest
+npm install -g openai-vector-store-mcp@latest
 
 # Configuration file location
 ~/Library/Application Support/Claude/claude_desktop_config.json
@@ -525,8 +877,8 @@ npm install -g openai-vector-store-mcp
 #### Windows
 ```bash
 # Install Node.js from nodejs.org
-# Then install the MCP package
-npm install -g openai-vector-store-mcp
+# Then install the MCP package with @latest
+npm install -g openai-vector-store-mcp@latest
 
 # Configuration file location
 %APPDATA%\Claude\claude_desktop_config.json
@@ -537,8 +889,8 @@ npm install -g openai-vector-store-mcp
 # Install Node.js (Ubuntu/Debian)
 sudo apt update && sudo apt install nodejs npm
 
-# Install the MCP package
-npm install -g openai-vector-store-mcp
+# Install the MCP package with @latest
+npm install -g openai-vector-store-mcp@latest
 
 # Configuration file location
 ~/.config/Claude/claude_desktop_config.json
@@ -561,13 +913,13 @@ npm install -g openai-vector-store-mcp
 
 #### NPM Package Debug
 ```bash
-DEBUG=* OPENAI_API_KEY="your-key" npx openai-vector-store-mcp
+DEBUG=* OPENAI_API_KEY="your-key" npx openai-vector-store-mcp@latest
 ```
 
 #### Cloudflare Workers Debug
 ```bash
 # Test with verbose curl output
-curl -v -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -v -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 ```
@@ -581,10 +933,17 @@ curl -v -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API
 
 ### Migration from Previous Versions
 
+If upgrading from version 1.1.x to 1.2.0:
+
+1. **New File Management Tools**: 6 new tools added for complete file-to-vector-store workflow
+2. **Update Roo Configuration**: Add new tools to `alwaysAllow` array for seamless operation
+3. **Enhanced Capabilities**: Now supports direct file upload from local filesystem
+4. **Version Update**: Update package references to use version 1.2.0
+
 If upgrading from version 1.0.x:
 
 1. **Update Configuration**: New installation options available
-2. **Tool Names**: All 15 tools now available (was 4 in early versions)
+2. **Tool Names**: All 21 tools now available (was 4 in early versions)
 3. **Performance**: Significant improvements in response times
 4. **Reliability**: Enhanced error handling and retry logic
 
@@ -595,7 +954,97 @@ If upgrading from version 1.0.x:
 3. **Network Security**: All communications use HTTPS/TLS
 4. **Access Control**: Server inherits your OpenAI API key permissions
 
+## 📋 Best Practices
+
+### Package Version Management
+
+#### When to Use @latest
+- **Recommended for most users**: Ensures you get the latest bug fixes and improvements
+- **NPM cache issues**: Bypasses cache problems that can cause outdated versions
+- **New installations**: Always use @latest for fresh setups
+- **Troubleshooting**: First step when experiencing issues
+
+#### When to Pin Versions
+- **Production environments**: Consider pinning to specific versions for stability
+- **CI/CD pipelines**: Pin versions to ensure reproducible builds
+- **Team coordination**: Pin when entire team needs same version
+
+#### Version Management Commands
+```bash
+# Check current version
+npx openai-vector-store-mcp@latest --version
+
+# Clear cache and update
+npm cache clean --force
+npm install -g openai-vector-store-mcp@latest
+
+# Pin to specific version (if needed)
+npm install -g openai-vector-store-mcp@1.2.3
+```
+
+### Client Configuration Best Practices
+
+#### Claude Desktop
+- Always use `@latest` in configuration files
+- Restart Claude Desktop after configuration changes
+- Use environment variables for API keys
+- Validate JSON syntax before saving
+
+#### Claude Code CLI
+- Use appropriate scope for your needs:
+  - `--scope local`: Personal development
+  - `--scope project`: Team collaboration
+  - `--scope user`: Cross-project utilities
+- Leverage environment variable expansion in `.mcp.json`
+- Use `/mcp` command to check server status
+
+#### Roo
+- Always include complete `alwaysAllow` array
+- Use exact tool names as documented
+- Restart Roo after configuration changes
+- Prefer NPM package over Cloudflare Workers for best performance
+
+### Troubleshooting Matrix
+
+| Issue | Claude Desktop | Claude Code CLI | Roo |
+|-------|---------------|-----------------|-----|
+| **Outdated Version** | Use `@latest` in config | `claude mcp remove` then re-add with `@latest` | Use `@latest` in config |
+| **Cache Issues** | `npm cache clean --force` | `npm cache clean --force` | `npm cache clean --force` |
+| **Permission Denied** | Check API key in env | Check `--env` flag | Add tools to `alwaysAllow` |
+| **Server Not Found** | Restart client | `claude mcp list` to verify | Restart Roo |
+| **Config Syntax** | Validate JSON | `cat .mcp.json \| python -m json.tool` | Validate JSON |
+
+### Security Best Practices
+
+1. **API Key Management**
+   - Never commit API keys to version control
+   - Use environment variables in configuration files
+   - Rotate API keys regularly
+   - Monitor API usage for unusual activity
+
+2. **Configuration Security**
+   - Keep configuration files in secure locations
+   - Use appropriate file permissions
+   - Avoid sharing configuration files with embedded keys
+
+3. **Network Security**
+   - All communications use HTTPS/TLS
+   - Server inherits your OpenAI API key permissions
+   - Consider firewall rules for local development
+
 ## 🎯 Roadmap
+
+### Version 1.2.0 - Complete File-to-Vector-Store Workflow ✅ COMPLETED
+- [x] **File Upload Capabilities**: Direct file upload from local filesystem to OpenAI
+- [x] **Complete End-to-End Workflow**: Transform from vector store management to complete pipeline
+- [x] **Large File Support**: Multipart uploads for files up to 512MB
+- [x] **File Management Suite**: Comprehensive file operations (upload, list, get, delete, content)
+- [x] **Memory Efficiency**: Streaming uploads for large files
+- [x] **MIME Type Detection**: Automatic content type detection
+- [x] **21 Total Tools**: 6 new file management tools + 15 existing vector store tools
+- [x] **Real-World Problem Solved**: 470 PDF files scenario and similar bulk processing use cases
+- [x] **Production Ready**: Deployed and tested on Cloudflare Workers
+- [x] **Client Integration**: Full compatibility with Claude Desktop, Roo, and all MCP clients
 
 ### Version 1.1.0 - Universal MCP Server ✅
 - [x] **Three Installation Options**: NPM package, Cloudflare Workers, Local development
@@ -614,17 +1063,20 @@ If upgrading from version 1.0.x:
 - [x] Comprehensive documentation and testing
 
 ### Future Enhancements 🚧
-- [ ] **File Upload/Download**: Direct file upload capabilities through MCP
-- [ ] **Advanced Search**: Vector similarity search and filtering
+- [ ] **Advanced Search**: Vector similarity search and filtering within vector stores
 - [ ] **Caching Layer**: Redis/KV caching for improved performance
-- [ ] **Webhook Support**: Async operation notifications
-- [ ] **Multi-Provider Support**: Support for other vector store providers
-- [ ] **Web Interface**: Optional web UI for vector store management
+- [ ] **Webhook Support**: Async operation notifications for long-running uploads
+- [ ] **Multi-Provider Support**: Support for other vector store providers (Pinecone, Weaviate)
+- [ ] **Web Interface**: Optional web UI for vector store and file management
+- [ ] **Batch File Processing**: Upload and process multiple files in a single operation
+- [ ] **File Format Conversion**: Automatic conversion between supported file formats
+- [ ] **Content Extraction**: Enhanced text extraction from PDFs, images, and other formats
 
 ### Version History
-- **v1.1.0** (Current): Universal MCP Server with three deployment options
-- **v1.0.1**: NPM package improvements and bug fixes
-- **v1.0.0**: Initial release with Cloudflare Workers deployment
+- **v1.2.0** (Current - January 30, 2025): Complete file-to-vector-store workflow with 21 tools
+- **v1.1.0** (January 29, 2025): Universal MCP Server with three deployment options
+- **v1.0.1** (December 15, 2024): NPM package improvements and bug fixes
+- **v1.0.0** (December 1, 2024): Initial release with Cloudflare Workers deployment
 
 ---
 

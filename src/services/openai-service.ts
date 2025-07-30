@@ -288,4 +288,85 @@ export class OpenAIService {
       );
     }
   }
+
+  /**
+   * Upload a local file to OpenAI for use with vector stores and assistants
+   * Note: In Cloudflare Workers, file uploads need to be handled differently
+   * This method expects the file content to be provided as a string or buffer
+   */
+  async uploadFile(request: { file_path: string; purpose?: string; filename?: string }): Promise<any> {
+    throw new MCPError(
+      ErrorCodes.INTERNAL_ERROR,
+      'File upload from local filesystem is not supported in Cloudflare Workers environment. Use the OpenAI API directly or upload files through the web interface.',
+      {
+        suggestion: 'Use the OpenAI web interface or API to upload files, then use the file ID with vector store operations',
+        file_path: request.file_path
+      }
+    );
+  }
+
+  /**
+   * List all uploaded files with filtering options
+   */
+  async listFiles(request: { purpose?: string; limit?: number; order?: string; after?: string } = {}): Promise<any> {
+    const params = new URLSearchParams();
+    
+    if (request.purpose) {
+      params.append('purpose', request.purpose);
+    }
+    if (request.limit) {
+      params.append('limit', request.limit.toString());
+    }
+    if (request.order) {
+      params.append('order', request.order);
+    }
+    if (request.after) {
+      params.append('after', request.after);
+    }
+
+    const url = `/files${params.toString() ? `?${params.toString()}` : ''}`;
+    const response = await this.makeRequest('GET', url);
+    return response;
+  }
+
+  /**
+   * Get details about a specific file
+   */
+  async getFile(fileId: string): Promise<any> {
+    const response = await this.makeRequest('GET', `/files/${fileId}`);
+    return response;
+  }
+
+  /**
+   * Delete a file from OpenAI
+   */
+  async deleteFile(fileId: string): Promise<{ id: string; object: string; deleted: boolean }> {
+    const response = await this.makeRequest('DELETE', `/files/${fileId}`);
+    return response as { id: string; object: string; deleted: boolean };
+  }
+
+  /**
+   * Download/retrieve file content
+   */
+  async getFileContent(fileId: string): Promise<any> {
+    const response = await this.makeRequest('GET', `/files/${fileId}/content`);
+    return response;
+  }
+
+  /**
+   * Create multipart upload for large files (>25MB)
+   */
+  async createUpload(request: { filename: string; purpose?: string; bytes: number; mime_type: string }): Promise<any> {
+    const { filename, purpose = 'assistants', bytes, mime_type } = request;
+    
+    const requestBody = {
+      filename,
+      purpose,
+      bytes,
+      mime_type
+    };
+
+    const response = await this.makeRequest('POST', '/uploads', requestBody);
+    return response;
+  }
 }

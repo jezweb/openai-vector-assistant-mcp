@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+        "https://vectorstore.jezweb.com/mcp/YOUR_OPENAI_API_KEY_HERE"
       ],
       "env": {}
     }

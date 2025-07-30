@@ -137,32 +137,23 @@ class RooCompatibleMCPServer {
     
     this.logDebug('Handling initialize request:', params);
 
-    // Validate API key
+    // Get API key from environment (will be set by MCP client)
     const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      this.sendErrorResponse(id, -32602, 'Invalid params', 'OPENAI_API_KEY environment variable is required');
-      return;
-    }
-
-    // Initialize OpenAI service
-    try {
-      this.openaiService = new OpenAIService(apiKey);
-      
-      // Validate API key by making a test request
-      const isValid = await this.openaiService.validateApiKey();
-      if (!isValid) {
-        this.sendErrorResponse(id, -32001, 'Unauthorized', 'Invalid OpenAI API key');
-        return;
+    
+    // Initialize without API key validation - validation happens when tools are called
+    if (apiKey) {
+      try {
+        this.openaiService = new OpenAIService(apiKey);
+        this.logDebug('OpenAI service initialized with API key');
+      } catch (error) {
+        this.logError('Failed to initialize OpenAI service:', error);
+        // Don't fail initialization - just log the error
       }
-
-      this.isInitialized = true;
-      this.logDebug('OpenAI service initialized successfully');
-
-    } catch (error) {
-      this.logError('Failed to initialize OpenAI service:', error);
-      this.sendErrorResponse(id, -32603, 'Internal error', 'Failed to initialize OpenAI service');
-      return;
+    } else {
+      this.logDebug('No API key provided during initialization - will validate when tools are called');
     }
+
+    this.isInitialized = true;
 
     // Send initialization response
     const response = {
@@ -177,7 +168,7 @@ class RooCompatibleMCPServer {
         },
         serverInfo: {
           name: 'roo-compatible-openai-vector-store-mcp',
-          version: '1.0.0'
+          version: '1.2.0'
         }
       }
     };
@@ -204,186 +195,259 @@ class RooCompatibleMCPServer {
     const tools = [
       {
         name: 'vector-store-create',
-        description: 'Create a new vector store',
+        description: 'Create a new vector store for organizing and searching through files. Perfect for setting up document collections, knowledge bases, or project-specific file repositories. Use this when starting a new project that needs file search capabilities.',
         inputSchema: {
           type: 'object',
           properties: {
-            name: { type: 'string', description: 'Name of the vector store' },
-            expires_after_days: { type: 'number', description: 'Number of days after which the vector store expires (optional)' },
-            metadata: { type: 'object', description: 'Additional metadata for the vector store (optional)' }
+            name: { type: 'string', description: 'Descriptive name for the vector store (e.g., "Project Documentation", "Research Papers", "Customer Support KB")' },
+            expires_after_days: { type: 'number', description: 'Auto-deletion after specified days (1-365). Useful for temporary projects or testing. Leave empty for permanent storage.' },
+            metadata: { type: 'object', description: 'Custom metadata for organization (e.g., {"project": "alpha", "department": "engineering", "version": "1.0"})' }
           },
           required: ['name']
         }
       },
       {
         name: 'vector-store-list',
-        description: 'List all vector stores',
+        description: 'Retrieve all your vector stores with their details, file counts, and status. Essential for managing multiple projects and understanding your storage usage. Shows creation dates, expiration times, and file statistics.',
         inputSchema: {
           type: 'object',
           properties: {
-            limit: { type: 'number', description: 'Maximum number of vector stores to return (default: 20)' },
-            order: { type: 'string', enum: ['asc', 'desc'], description: 'Sort order by created_at timestamp' }
+            limit: { type: 'number', description: 'Maximum results to return (1-100, default: 20). Use smaller limits for quick overviews, larger for comprehensive audits.' },
+            order: { type: 'string', enum: ['asc', 'desc'], description: 'Sort by creation date: "desc" for newest first (default), "asc" for oldest first' }
           }
         }
       },
       {
         name: 'vector-store-get',
-        description: 'Get details of a specific vector store',
+        description: 'Get comprehensive details about a specific vector store including file count, processing status, expiration date, metadata, and usage statistics. Use this to monitor store health and understand its current state.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store to retrieve' }
+            vector_store_id: { type: 'string', description: 'Unique identifier of the vector store (starts with "vs_"). Find this ID using vector-store-list.' }
           },
           required: ['vector_store_id']
         }
       },
       {
         name: 'vector-store-delete',
-        description: 'Delete a vector store',
+        description: 'Permanently delete a vector store and all its associated files. This action cannot be undone. Use for cleanup, project completion, or when storage limits are reached. All files in the store will be removed.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store to delete' }
+            vector_store_id: { type: 'string', description: 'ID of the vector store to permanently delete. Double-check this ID as deletion is irreversible.' }
           },
           required: ['vector_store_id']
         }
       },
       {
         name: 'vector-store-modify',
-        description: 'Modify a vector store',
+        description: 'Update vector store properties like name, expiration date, or metadata. Perfect for renaming projects, extending deadlines, or updating organizational tags. Only specified fields will be changed.',
         inputSchema: {
           type: 'object',
           properties: {
             vector_store_id: { type: 'string', description: 'ID of the vector store to modify' },
-            name: { type: 'string', description: 'New name for the vector store (optional)' },
-            expires_after_days: { type: 'number', description: 'Number of days after which the vector store expires (optional)' },
-            metadata: { type: 'object', description: 'Additional metadata for the vector store (optional)' }
+            name: { type: 'string', description: 'New descriptive name (e.g., rename "Test Store" to "Production Knowledge Base")' },
+            expires_after_days: { type: 'number', description: 'New expiration period in days from now (1-365), or null to remove expiration' },
+            metadata: { type: 'object', description: 'Updated metadata object. This replaces existing metadata entirely.' }
           },
           required: ['vector_store_id']
         }
       },
       {
         name: 'vector-store-file-add',
-        description: 'Add an existing file to a vector store',
+        description: 'Add a previously uploaded file to a vector store for search and retrieval. The file must already exist in your OpenAI account (uploaded via Files API). This enables the file to be searched and referenced in conversations.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            file_id: { type: 'string', description: 'ID of the file to add' }
+            vector_store_id: { type: 'string', description: 'Target vector store ID where the file will be added' },
+            file_id: { type: 'string', description: 'OpenAI file ID (starts with "file-") of an already uploaded file. Get this from the Files API or OpenAI dashboard.' }
           },
           required: ['vector_store_id', 'file_id']
         }
       },
       {
         name: 'vector-store-file-list',
-        description: 'List files in a vector store',
+        description: 'List all files in a vector store with their processing status, metadata, and usage statistics. Essential for monitoring file processing progress and managing store contents. Shows which files are ready for search.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            limit: { type: 'number', description: 'Maximum number of files to return (default: 20)' },
-            filter: { type: 'string', enum: ['in_progress', 'completed', 'failed', 'cancelled'], description: 'Filter files by status' }
+            vector_store_id: { type: 'string', description: 'Vector store ID to list files from' },
+            limit: { type: 'number', description: 'Maximum files to return (1-100, default: 20). Use pagination for large stores.' },
+            filter: { type: 'string', enum: ['in_progress', 'completed', 'failed', 'cancelled'], description: 'Filter by processing status: "completed" for ready files, "in_progress" for processing, "failed" for errors' }
           },
           required: ['vector_store_id']
         }
       },
       {
         name: 'vector-store-file-get',
-        description: 'Get details of a specific file in a vector store',
+        description: 'Get detailed information about a specific file in a vector store including processing status, chunk count, error details, and metadata. Use this to troubleshoot file processing issues or verify file readiness.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            file_id: { type: 'string', description: 'ID of the file to retrieve' }
+            vector_store_id: { type: 'string', description: 'Vector store containing the file' },
+            file_id: { type: 'string', description: 'File ID to get details for (starts with "file-")' }
           },
           required: ['vector_store_id', 'file_id']
         }
       },
       {
         name: 'vector-store-file-content',
-        description: 'Get content of a specific file in a vector store',
+        description: 'Retrieve the actual content/text of a file stored in a vector store. Perfect for reviewing file contents, debugging search issues, or extracting specific information. Returns the processed text that is used for search.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            file_id: { type: 'string', description: 'ID of the file to get content from' }
+            vector_store_id: { type: 'string', description: 'Vector store containing the file' },
+            file_id: { type: 'string', description: 'File ID to retrieve content from (starts with "file-")' }
           },
           required: ['vector_store_id', 'file_id']
         }
       },
       {
         name: 'vector-store-file-update',
-        description: 'Update metadata of a file in a vector store',
+        description: 'Update the metadata associated with a file in a vector store. Useful for adding tags, categories, version numbers, or other organizational information. Does not change the file content, only its metadata.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            file_id: { type: 'string', description: 'ID of the file to update' },
-            metadata: { type: 'object', description: 'New metadata for the file' }
+            vector_store_id: { type: 'string', description: 'Vector store containing the file' },
+            file_id: { type: 'string', description: 'File ID to update metadata for' },
+            metadata: { type: 'object', description: 'New metadata object (e.g., {"category": "manual", "version": "2.1", "author": "team-alpha"})' }
           },
           required: ['vector_store_id', 'file_id', 'metadata']
         }
       },
       {
         name: 'vector-store-file-delete',
-        description: 'Delete a file from a vector store',
+        description: 'Remove a file from a vector store permanently. The file will no longer be searchable or accessible through this store. The original file in your OpenAI account remains unchanged - only the vector store association is removed.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            file_id: { type: 'string', description: 'ID of the file to delete' }
+            vector_store_id: { type: 'string', description: 'Vector store to remove the file from' },
+            file_id: { type: 'string', description: 'File ID to remove from the store (starts with "file-")' }
           },
           required: ['vector_store_id', 'file_id']
         }
       },
       {
         name: 'vector-store-file-batch-create',
-        description: 'Create a file batch for a vector store',
+        description: 'Create a batch operation to add multiple files to a vector store simultaneously. Much more efficient than adding files one by one. Perfect for bulk uploads, project migrations, or when adding large document collections. Provides a single operation to track.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            file_ids: { type: 'array', items: { type: 'string' }, description: 'Array of file IDs to add to the batch' }
+            vector_store_id: { type: 'string', description: 'Target vector store for the batch operation' },
+            file_ids: { type: 'array', items: { type: 'string' }, description: 'Array of file IDs to add (e.g., ["file-abc123", "file-def456"]). All files must already exist in your OpenAI account.' }
           },
           required: ['vector_store_id', 'file_ids']
         }
       },
       {
         name: 'vector-store-file-batch-get',
-        description: 'Get status of a file batch',
+        description: 'Check the status and progress of a batch file operation. Shows how many files have been processed, completed, or failed. Essential for monitoring long-running batch operations and identifying any processing issues.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            batch_id: { type: 'string', description: 'ID of the batch to retrieve' }
+            vector_store_id: { type: 'string', description: 'Vector store containing the batch' },
+            batch_id: { type: 'string', description: 'Batch operation ID to check (starts with "vsfb-"). Get this from vector-store-file-batch-create.' }
           },
           required: ['vector_store_id', 'batch_id']
         }
       },
       {
         name: 'vector-store-file-batch-cancel',
-        description: 'Cancel a file batch',
+        description: 'Cancel a running batch operation before it completes. Useful when you need to stop a large batch due to errors, changed requirements, or resource constraints. Files already processed will remain in the vector store.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            batch_id: { type: 'string', description: 'ID of the batch to cancel' }
+            vector_store_id: { type: 'string', description: 'Vector store containing the batch to cancel' },
+            batch_id: { type: 'string', description: 'Batch operation ID to cancel (starts with "vsfb-")' }
           },
           required: ['vector_store_id', 'batch_id']
         }
       },
       {
         name: 'vector-store-file-batch-files',
-        description: 'List files in a file batch',
+        description: 'List all files in a specific batch operation with their individual processing status. Perfect for detailed monitoring, troubleshooting failed files, or getting a complete audit of batch results. Shows which files succeeded or failed.',
         inputSchema: {
           type: 'object',
           properties: {
-            vector_store_id: { type: 'string', description: 'ID of the vector store' },
-            batch_id: { type: 'string', description: 'ID of the batch' },
-            limit: { type: 'number', description: 'Maximum number of files to return (default: 20)' },
-            filter: { type: 'string', enum: ['in_progress', 'completed', 'failed', 'cancelled'], description: 'Filter files by status' }
+            vector_store_id: { type: 'string', description: 'Vector store containing the batch' },
+            batch_id: { type: 'string', description: 'Batch operation ID to list files from' },
+            limit: { type: 'number', description: 'Maximum files to return (1-100, default: 20). Use pagination for large batches.' },
+            filter: { type: 'string', enum: ['in_progress', 'completed', 'failed', 'cancelled'], description: 'Filter by file status: "failed" to see errors, "completed" for successful files' }
           },
           required: ['vector_store_id', 'batch_id']
+        }
+      },
+      {
+        name: 'file-upload',
+        description: 'Upload a local file to OpenAI for use with vector stores and assistants. This enables the complete workflow: upload file → add to vector store.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            file_path: { type: 'string', description: 'Path to the local file to upload (e.g., "./documents/manual.pdf", "/home/user/data.txt")' },
+            purpose: { type: 'string', enum: ['assistants', 'vision', 'batch'], description: 'Purpose of the file upload. Use "assistants" for vector stores and chat.' },
+            filename: { type: 'string', description: 'Optional custom filename for the uploaded file. If not provided, uses the original filename.' }
+          },
+          required: ['file_path']
+        }
+      },
+      {
+        name: 'file-list',
+        description: 'List all uploaded files in your OpenAI account with filtering options. Essential for managing your file storage and finding file IDs for vector store operations.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            purpose: { type: 'string', enum: ['assistants', 'vision', 'batch'], description: 'Filter files by purpose. Use "assistants" to see files available for vector stores.' },
+            limit: { type: 'number', description: 'Maximum number of files to return (1-10000, default: 20)' },
+            order: { type: 'string', enum: ['asc', 'desc'], description: 'Sort order by created_at: "desc" for newest first, "asc" for oldest first' },
+            after: { type: 'string', description: 'File ID to start listing after (for pagination)' }
+          }
+        }
+      },
+      {
+        name: 'file-get',
+        description: 'Get detailed information about a specific uploaded file including size, purpose, creation date, and processing status. Use this to verify file details before adding to vector stores.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            file_id: { type: 'string', description: 'OpenAI file ID to retrieve details for (starts with "file-")' }
+          },
+          required: ['file_id']
+        }
+      },
+      {
+        name: 'file-delete',
+        description: 'Permanently delete a file from your OpenAI account. This will remove the file from all vector stores and make it unavailable for future use. Use with caution as this action cannot be undone.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            file_id: { type: 'string', description: 'OpenAI file ID to delete (starts with "file-"). Double-check this ID as deletion is irreversible.' }
+          },
+          required: ['file_id']
+        }
+      },
+      {
+        name: 'file-content',
+        description: 'Download and retrieve the actual content of an uploaded file. Perfect for reviewing file contents, verifying uploads, or extracting text for analysis.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            file_id: { type: 'string', description: 'OpenAI file ID to download content from (starts with "file-")' }
+          },
+          required: ['file_id']
+        }
+      },
+      {
+        name: 'upload-create',
+        description: 'Create a multipart upload session for large files (>25MB). This enables efficient upload of large documents by splitting them into chunks. Use this for files that exceed the standard upload limit.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            filename: { type: 'string', description: 'Name of the file to upload (e.g., "large-dataset.pdf")' },
+            purpose: { type: 'string', enum: ['assistants', 'vision', 'batch'], description: 'Purpose of the file upload. Use "assistants" for vector stores.' },
+            bytes: { type: 'number', description: 'Total size of the file in bytes' },
+            mime_type: { type: 'string', description: 'MIME type of the file (e.g., "application/pdf", "text/plain")' }
+          },
+          required: ['filename', 'bytes', 'mime_type']
         }
       }
     ];
@@ -401,6 +465,30 @@ class RooCompatibleMCPServer {
     if (!this.isInitialized) {
       this.sendErrorResponse(request.id, -32002, 'Server not initialized', 'Call initialize first');
       return;
+    }
+
+    // Validate API key when tools are actually called
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      this.sendErrorResponse(request.id, -32602, 'Invalid params', 'OPENAI_API_KEY environment variable is required. Please configure it in your MCP client.');
+      return;
+    }
+
+    if (!apiKey.startsWith('sk-')) {
+      this.sendErrorResponse(request.id, -32602, 'Invalid params', 'OPENAI_API_KEY must be a valid OpenAI API key starting with "sk-"');
+      return;
+    }
+
+    // Initialize OpenAI service if not already done or if API key changed
+    if (!this.openaiService || this.openaiService.apiKey !== apiKey) {
+      try {
+        this.openaiService = new OpenAIService(apiKey);
+        this.logDebug('OpenAI service initialized/updated with API key');
+      } catch (error) {
+        this.logError('Failed to initialize OpenAI service:', error);
+        this.sendErrorResponse(request.id, -32603, 'Internal error', 'Failed to initialize OpenAI service');
+        return;
+      }
     }
 
     const { name, arguments: args } = request.params;
@@ -528,6 +616,59 @@ class RooCompatibleMCPServer {
           });
           break;
 
+        case 'file-upload':
+          if (!args.file_path) {
+            throw new Error('file_path is required');
+          }
+          result = await this.openaiService.uploadFile({
+            file_path: args.file_path,
+            purpose: args.purpose,
+            filename: args.filename
+          });
+          break;
+
+        case 'file-list':
+          result = await this.openaiService.listFiles({
+            purpose: args.purpose,
+            limit: args.limit,
+            order: args.order,
+            after: args.after
+          });
+          break;
+
+        case 'file-get':
+          if (!args.file_id) {
+            throw new Error('file_id is required');
+          }
+          result = await this.openaiService.getFile(args.file_id);
+          break;
+
+        case 'file-delete':
+          if (!args.file_id) {
+            throw new Error('file_id is required');
+          }
+          result = await this.openaiService.deleteFile(args.file_id);
+          break;
+
+        case 'file-content':
+          if (!args.file_id) {
+            throw new Error('file_id is required');
+          }
+          result = await this.openaiService.getFileContent(args.file_id);
+          break;
+
+        case 'upload-create':
+          if (!args.filename || !args.bytes || !args.mime_type) {
+            throw new Error('filename, bytes, and mime_type are required');
+          }
+          result = await this.openaiService.createUpload({
+            filename: args.filename,
+            purpose: args.purpose,
+            bytes: args.bytes,
+            mime_type: args.mime_type
+          });
+          break;
+
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -611,25 +752,10 @@ class RooCompatibleMCPServer {
   }
 }
 
-// Environment validation
-function validateEnvironment() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    console.error('[ERROR] OPENAI_API_KEY environment variable is required');
-    process.exit(1);
-  }
-
-  if (!apiKey.startsWith('sk-')) {
-    console.error('[ERROR] OPENAI_API_KEY must be a valid OpenAI API key starting with "sk-"');
-    process.exit(1);
-  }
-
-  console.error('[INFO] Environment validation passed');
-}
-
 // Start the server
 if (require.main === module) {
-  validateEnvironment();
+  console.error('[INFO] Starting OpenAI Vector Store MCP Server...');
+  console.error('[INFO] API key will be validated when tools are called');
   new RooCompatibleMCPServer();
 }
 

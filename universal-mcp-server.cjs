@@ -177,7 +177,7 @@ class RooCompatibleMCPServer {
         },
         serverInfo: {
           name: 'roo-compatible-openai-vector-store-mcp',
-          version: '1.0.0'
+          version: '1.2.0'
         }
       }
     };
@@ -385,6 +385,79 @@ class RooCompatibleMCPServer {
           },
           required: ['vector_store_id', 'batch_id']
         }
+      },
+      {
+        name: 'file-upload',
+        description: 'Upload a local file to OpenAI for use with vector stores and assistants. This enables the complete workflow: upload file → add to vector store.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            file_path: { type: 'string', description: 'Path to the local file to upload (e.g., "./documents/manual.pdf", "/home/user/data.txt")' },
+            purpose: { type: 'string', enum: ['assistants', 'vision', 'batch'], description: 'Purpose of the file upload. Use "assistants" for vector stores and chat.' },
+            filename: { type: 'string', description: 'Optional custom filename for the uploaded file. If not provided, uses the original filename.' }
+          },
+          required: ['file_path']
+        }
+      },
+      {
+        name: 'file-list',
+        description: 'List all uploaded files in your OpenAI account with filtering options. Essential for managing your file storage and finding file IDs for vector store operations.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            purpose: { type: 'string', enum: ['assistants', 'vision', 'batch'], description: 'Filter files by purpose. Use "assistants" to see files available for vector stores.' },
+            limit: { type: 'number', description: 'Maximum number of files to return (1-10000, default: 20)' },
+            order: { type: 'string', enum: ['asc', 'desc'], description: 'Sort order by created_at: "desc" for newest first, "asc" for oldest first' },
+            after: { type: 'string', description: 'File ID to start listing after (for pagination)' }
+          }
+        }
+      },
+      {
+        name: 'file-get',
+        description: 'Get detailed information about a specific uploaded file including size, purpose, creation date, and processing status. Use this to verify file details before adding to vector stores.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            file_id: { type: 'string', description: 'OpenAI file ID to retrieve details for (starts with "file-")' }
+          },
+          required: ['file_id']
+        }
+      },
+      {
+        name: 'file-delete',
+        description: 'Permanently delete a file from your OpenAI account. This will remove the file from all vector stores and make it unavailable for future use. Use with caution as this action cannot be undone.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            file_id: { type: 'string', description: 'OpenAI file ID to delete (starts with "file-"). Double-check this ID as deletion is irreversible.' }
+          },
+          required: ['file_id']
+        }
+      },
+      {
+        name: 'file-content',
+        description: 'Download and retrieve the actual content of an uploaded file. Perfect for reviewing file contents, verifying uploads, or extracting text for analysis.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            file_id: { type: 'string', description: 'OpenAI file ID to download content from (starts with "file-")' }
+          },
+          required: ['file_id']
+        }
+      },
+      {
+        name: 'upload-create',
+        description: 'Create a multipart upload session for large files (>25MB). This enables efficient upload of large documents by splitting them into chunks. Use this for files that exceed the standard upload limit.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            filename: { type: 'string', description: 'Name of the file to upload (e.g., "large-dataset.pdf")' },
+            purpose: { type: 'string', enum: ['assistants', 'vision', 'batch'], description: 'Purpose of the file upload. Use "assistants" for vector stores.' },
+            bytes: { type: 'number', description: 'Total size of the file in bytes' },
+            mime_type: { type: 'string', description: 'MIME type of the file (e.g., "application/pdf", "text/plain")' }
+          },
+          required: ['filename', 'bytes', 'mime_type']
+        }
       }
     ];
 
@@ -525,6 +598,59 @@ class RooCompatibleMCPServer {
           result = await this.openaiService.listVectorStoreFileBatchFiles(args.vector_store_id, args.batch_id, {
             limit: args.limit,
             filter: args.filter
+          });
+          break;
+
+        case 'file-upload':
+          if (!args.file_path) {
+            throw new Error('file_path is required');
+          }
+          result = await this.openaiService.uploadFile({
+            file_path: args.file_path,
+            purpose: args.purpose,
+            filename: args.filename
+          });
+          break;
+
+        case 'file-list':
+          result = await this.openaiService.listFiles({
+            purpose: args.purpose,
+            limit: args.limit,
+            order: args.order,
+            after: args.after
+          });
+          break;
+
+        case 'file-get':
+          if (!args.file_id) {
+            throw new Error('file_id is required');
+          }
+          result = await this.openaiService.getFile(args.file_id);
+          break;
+
+        case 'file-delete':
+          if (!args.file_id) {
+            throw new Error('file_id is required');
+          }
+          result = await this.openaiService.deleteFile(args.file_id);
+          break;
+
+        case 'file-content':
+          if (!args.file_id) {
+            throw new Error('file_id is required');
+          }
+          result = await this.openaiService.getFileContent(args.file_id);
+          break;
+
+        case 'upload-create':
+          if (!args.filename || !args.bytes || !args.mime_type) {
+            throw new Error('filename, bytes, and mime_type are required');
+          }
+          result = await this.openaiService.createUpload({
+            filename: args.filename,
+            purpose: args.purpose,
+            bytes: args.bytes,
+            mime_type: args.mime_type
           });
           break;
 

@@ -1,0 +1,14 @@
+This is a test file for the Universal MCP Server Phase 2 implementation.
+
+The new file management tools include:
+1. file-upload - Upload local files to OpenAI
+2. file-list - List all uploaded files
+3. file-get - Get file details
+4. file-delete - Delete files
+5. file-content - Download file content
+6. upload-create - Create multipart uploads for large files
+
+This completes the end-to-end workflow:
+Upload file → Add to vector store → Search and retrieve
+
+Phase 2 successfully transforms the MCP server from "vector store management only" to "complete file-to-vector-store workflow" that users need in real-world scenarios.

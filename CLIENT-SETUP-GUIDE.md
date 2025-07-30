@@ -13,7 +13,7 @@ Choose the deployment option that best fits your needs:
 - **Best for**: Most users, especially Roo users
 
 ### ☁️ Option 2: Cloudflare Workers
-- **Production URL**: `https://mcp-server-cloudflare.webfonts.workers.dev`
+- **Production URL**: `https://vectorstore.jezweb.com`
 - **Transport**: HTTP via `mcp-proxy`
 - **Setup**: Zero installation required
 - **Best for**: Users who prefer cloud deployment
@@ -55,6 +55,47 @@ All deployment options provide **15 comprehensive vector store management tools*
 2. **Node.js**: Version 18.0.0 or higher (required for NPM package and local development)
 3. **MCP Client**: Claude Desktop, Roo, or other MCP-compatible client
 
+## 🔑 Getting Started with OpenAI
+
+Before configuring your MCP client, ensure you have proper OpenAI access:
+
+### 1. **Obtain Your OpenAI API Key**
+- Visit the [OpenAI API Keys page](https://platform.openai.com/api-keys)
+- Create a new API key or use an existing one
+- Copy your API key (starts with `sk-proj-` or `sk-`)
+- **Important**: Keep your API key secure and never share it publicly
+
+### 2. **Monitor Your Vector Stores**
+- Access your [OpenAI Storage Dashboard](https://platform.openai.com/storage)
+- View all your vector stores, file counts, and storage usage
+- Monitor expiration dates and storage limits
+- Track costs and usage patterns
+
+### 3. **Verify API Access and Limits**
+- Check your [OpenAI Usage Dashboard](https://platform.openai.com/usage) for current usage
+- Review your account's API limits and quotas
+- Ensure you have access to the Assistants API (required for vector stores)
+- Understand [OpenAI Pricing](https://openai.com/pricing) for vector store operations
+
+### 4. **Understanding Vector Store Costs**
+- **Storage**: Charged per GB per day for stored files
+- **Processing**: Charged for file processing and indexing
+- **Retrieval**: Charged for search and retrieval operations
+- **Free Tier**: Limited vector store usage available
+
+### 📚 **Essential OpenAI Resources**
+- [Vector Stores Documentation](https://platform.openai.com/docs/assistants/tools/file-search) - Complete guide to vector stores
+- [Assistants API Overview](https://platform.openai.com/docs/assistants/overview) - Understanding the Assistants API
+- [File Upload Guide](https://platform.openai.com/docs/api-reference/files) - How to upload files for vector stores
+- [OpenAI Community](https://community.openai.com/) - Get help and share experiences
+
+### 🛡️ **Security Best Practices**
+- Store API keys in environment variables, never in code
+- Use different API keys for development and production
+- Regularly rotate your API keys
+- Monitor your API usage for unexpected activity
+- Set up usage alerts in your OpenAI dashboard
+
 ---
 
 ## 📦 Option 1: NPM Package Setup (Recommended)
@@ -68,15 +109,20 @@ All deployment options provide **15 comprehensive vector store management tools*
 ### Installation
 
 ```bash
-# Option A: Use directly with npx (no installation required)
-npx openai-vector-store-mcp
+# Option A: Use directly with npx (recommended for latest fixes)
+npx openai-vector-store-mcp@latest
 
 # Option B: Install globally for faster startup
-npm install -g openai-vector-store-mcp
+npm install -g openai-vector-store-mcp@latest
 
 # Option C: Install locally in your project
-npm install openai-vector-store-mcp
+npm install openai-vector-store-mcp@latest
 ```
+
+**💡 Why use @latest?**
+- Ensures you get the most recent bug fixes and improvements
+- Bypasses NPM cache issues that can cause outdated versions
+- Recommended for most reliable experience
 
 ### Claude Desktop Configuration
 
@@ -92,7 +138,7 @@ Add to your Claude Desktop configuration file:
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": ["openai-vector-store-mcp"],
+      "args": ["openai-vector-store-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key-here"
       }
@@ -110,7 +156,7 @@ Add to your Roo configuration file (typically `~/.config/roo/config.json`):
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": ["openai-vector-store-mcp"],
+      "args": ["openai-vector-store-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key-here"
       },
@@ -134,6 +180,195 @@ Add to your Roo configuration file (typically `~/.config/roo/config.json`):
     }
   }
 }
+```
+
+---
+
+## 🖥️ Claude Code CLI Setup
+
+### Why Choose Claude Code CLI?
+- **Command-line interface**: Perfect for developers who prefer CLI tools
+- **Multiple scope options**: Local, project, or user-level configurations
+- **Environment variable expansion**: Supports `${VAR}` syntax in configurations
+- **Project collaboration**: Share configurations via `.mcp.json` files
+- **Built-in management**: Easy server management with `claude mcp` commands
+
+### Prerequisites
+
+- Claude Code CLI installed and configured
+- Node.js 18+ (for NPM package execution)
+- OpenAI API key with Assistants API access
+
+### Basic Setup
+
+```bash
+# Add the MCP server with local scope (default - available only in current project)
+claude mcp add openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+
+# Add with project scope (shared with team via .mcp.json file)
+claude mcp add --scope project openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+
+# Add with user scope (available across all your projects)
+claude mcp add --scope user openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+```
+
+### Understanding Scopes
+
+#### Local Scope (Default)
+- **Usage**: `claude mcp add openai-vector-store ...` or `--scope local`
+- **Availability**: Only in the current project directory
+- **Storage**: Project-specific user settings
+- **Best for**: Personal development, experimental configurations, sensitive credentials
+
+#### Project Scope
+- **Usage**: `--scope project`
+- **Availability**: Shared with all team members via `.mcp.json` file
+- **Storage**: `.mcp.json` in project root (version controlled)
+- **Best for**: Team collaboration, project-specific tools, shared configurations
+
+#### User Scope
+- **Usage**: `--scope user`
+- **Availability**: Available across all your projects
+- **Storage**: User-level configuration
+- **Best for**: Personal utilities, development tools, frequently-used services
+
+### Managing MCP Servers
+
+```bash
+# List all configured servers
+claude mcp list
+
+# Get details for a specific server
+claude mcp get openai-vector-store
+
+# Remove a server
+claude mcp remove openai-vector-store
+
+# Check server status within Claude Code
+/mcp
+
+# Reset project choices (if needed)
+claude mcp reset-project-choices
+```
+
+### Project-Level Configuration (.mcp.json)
+
+When using `--scope project`, Claude Code creates a `.mcp.json` file in your project root:
+
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": ["openai-vector-store-mcp@latest"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+#### Environment Variable Expansion
+
+Claude Code supports powerful environment variable expansion:
+
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": ["openai-vector-store-mcp@latest"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "DEBUG": "${DEBUG:-false}",
+        "NODE_ENV": "${NODE_ENV:-production}"
+      }
+    }
+  }
+}
+```
+
+**Supported syntax:**
+- `${VAR}` - Expands to the value of environment variable `VAR`
+- `${VAR:-default}` - Expands to `VAR` if set, otherwise uses `default`
+
+### Advanced Configuration
+
+#### Multiple Environment Setup
+
+```bash
+# Development environment
+claude mcp add --scope local openai-vector-store-dev -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="${DEV_OPENAI_API_KEY}"
+
+# Production environment
+claude mcp add --scope user openai-vector-store-prod -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="${PROD_OPENAI_API_KEY}"
+```
+
+#### Team Collaboration Workflow
+
+1. **Project Lead**: Add server with project scope
+   ```bash
+   claude mcp add --scope project openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="${OPENAI_API_KEY}"
+   ```
+
+2. **Team Members**: Clone repository and set environment variable
+   ```bash
+   export OPENAI_API_KEY="your-team-api-key"
+   # Server automatically available via .mcp.json
+   ```
+
+3. **Verify Setup**: Check server status
+   ```bash
+   claude mcp list
+   /mcp  # Within Claude Code
+   ```
+
+### Troubleshooting Claude Code CLI
+
+#### Server Not Connecting
+```bash
+# Check server status
+claude mcp list
+claude mcp get openai-vector-store
+
+# Re-add with @latest
+claude mcp remove openai-vector-store
+claude mcp add openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-key"
+```
+
+#### Scope-Related Issues
+```bash
+# Check which scope the server is in
+claude mcp list
+
+# Move to different scope
+claude mcp remove openai-vector-store
+claude mcp add --scope user openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-key"
+```
+
+#### Project .mcp.json Issues
+```bash
+# Reset project choices if needed
+claude mcp reset-project-choices
+
+# Verify .mcp.json syntax
+cat .mcp.json | python -m json.tool
+
+# Check environment variable expansion
+echo $OPENAI_API_KEY
+```
+
+#### Permission and Authentication Issues
+```bash
+# Verify environment variable is set
+echo $OPENAI_API_KEY
+
+# Test server directly
+OPENAI_API_KEY="your-key" npx openai-vector-store-mcp@latest
+
+# Check Claude Code logs
+# (Location varies by system)
 ```
 
 ---
@@ -163,7 +398,7 @@ npm install -g mcp-proxy
       "command": "npx",
       "args": [
         "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+        "https://vectorstore.jezweb.com/mcp/YOUR_OPENAI_API_KEY_HERE"
       ]
     }
   }
@@ -179,7 +414,7 @@ npm install -g mcp-proxy
       "command": "npx",
       "args": [
         "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+        "https://vectorstore.jezweb.com/mcp/YOUR_OPENAI_API_KEY_HERE"
       ],
       "alwaysAllow": [
         "vector-store-create",
@@ -385,7 +620,7 @@ Test error scenarios:
 **Solutions**:
 - Verify your OpenAI API key is correct and has Assistants API access
 - Check that `mcp-proxy` is installed
-- Ensure the URL in your configuration is exactly: `https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY`
+- Ensure the URL in your configuration is exactly: `https://vectorstore.jezweb.com/mcp/YOUR_API_KEY`
 
 #### 2. "Authentication failed" or "Invalid API key"
 
@@ -427,7 +662,7 @@ cat your-config-file.json | python -m json.tool
 Test the server directly with curl:
 
 ```bash
-curl -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 ```
@@ -439,7 +674,7 @@ Expected response should include the 4 vector store tools.
 Ensure you can reach the server:
 
 ```bash
-curl -I https://mcp-server-cloudflare.webfonts.workers.dev
+curl -I https://vectorstore.jezweb.com
 ```
 
 #### 4. Verify Dependencies
@@ -645,7 +880,7 @@ nvm use 18
 **"Server not found" or "Connection failed"**
 ```bash
 # Test the server directly
-curl -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 
@@ -771,7 +1006,7 @@ DEBUG=* OPENAI_API_KEY="your-key" npx openai-vector-store-mcp
 #### Cloudflare Workers Debug
 ```bash
 # Test with verbose curl output
-curl -v -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -v -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 ```

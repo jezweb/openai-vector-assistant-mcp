@@ -1,7 +1,7 @@
 {
   "name": "openai-vector-store-mcp",
-  "version": "1.1.0",
-  "description": "Universal OpenAI Vector Store MCP Server with stdio transport - 15 comprehensive tools, enhanced Roo compatibility, and direct stdio performance",
+  "version": "1.2.0",
+  "description": "Universal OpenAI Vector Store MCP Server with stdio transport - 21 comprehensive tools including file management, enhanced Roo compatibility, and direct stdio performance",
   "main": "universal-mcp-server.cjs",
   "type": "commonjs",
   "bin": {
@@ -27,6 +27,14 @@
   ],
   "author": "Universal MCP Server Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jezweb/universal-openai-vector-store-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jezweb/universal-openai-vector-store-mcp/issues"
+  },
+  "homepage": "https://github.com/jezweb/universal-openai-vector-store-mcp#readme",
   "dependencies": {},
   "engines": {
     "node": ">=18.0.0"

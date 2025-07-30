@@ -17,19 +17,31 @@ The complete guide to deploying, configuring, and using the Universal OpenAI Vec
 
 ## Overview
 
-The Universal OpenAI Vector Store MCP Server provides comprehensive access to OpenAI's Vector Store API through the Model Context Protocol (MCP). Version 1.1.0 introduces three deployment options to meet different user needs and performance requirements.
+The Universal OpenAI Vector Store MCP Server provides comprehensive access to OpenAI's Vector Store API through the Model Context Protocol (MCP). Version 1.2.0 introduces complete file-to-vector-store workflow capabilities, solving real-world scenarios like processing 470 PDF files directly from your local filesystem.
 
 ### Key Features
 
-- **15 Comprehensive Tools**: Complete coverage of OpenAI's Vector Store API
+- **21 Comprehensive Tools**: Complete coverage of OpenAI's Vector Store API + file upload capabilities
+- **🆕 Complete End-to-End Workflow**: Upload files directly from local filesystem to OpenAI
 - **Three Deployment Options**: NPM package, Cloudflare Workers, and local development
 - **Universal Compatibility**: Works with Claude Desktop, Roo, and all MCP clients
 - **Enhanced Performance**: Direct stdio transport eliminates HTTP overhead
 - **Production Ready**: Global edge distribution with 99.9% uptime
+- **Large File Support**: Multipart uploads for files up to 512MB
 - **Type Safe**: Full TypeScript implementation with comprehensive error handling
 
-### What's New in 1.1.0
+### What's New in 1.2.0 (Phase 2)
 
+- **🆕 File Upload & Management**: 6 new tools for complete file-to-vector-store workflow
+- **Real-World Problem Solved**: Process hundreds of files directly from local filesystem
+- **Large File Support**: Multipart uploads for files >25MB
+- **Memory Efficient**: Streaming uploads for optimal performance
+- **MIME Type Detection**: Automatic content type detection
+- **Complete Pipeline**: Upload → Create Vector Store → Add Files → Query Documents
+
+### Previous Releases
+
+#### Version 1.1.0
 - **NPM Package**: Direct stdio transport for maximum performance
 - **Enhanced Roo Support**: Complete `alwaysAllow` configuration
 - **11 New Tools**: File management and batch operations
@@ -51,14 +63,14 @@ The Universal OpenAI Vector Store MCP Server provides comprehensive access to Op
 
 **Installation**:
 ```bash
-# Option A: Direct usage (no installation)
-npx openai-vector-store-mcp
+# Option A: Direct usage with latest version (recommended)
+npx openai-vector-store-mcp@latest
 
 # Option B: Global installation
-npm install -g openai-vector-store-mcp
+npm install -g openai-vector-store-mcp@latest
 
 # Option C: Local project installation
-npm install openai-vector-store-mcp
+npm install openai-vector-store-mcp@latest
 ```
 
 ### ☁️ Option 2: Cloudflare Workers
@@ -72,7 +84,7 @@ npm install openai-vector-store-mcp
 - 99.9% uptime guarantee
 - Automatic scaling
 
-**URL**: `https://mcp-server-cloudflare.webfonts.workers.dev`
+**URL**: `https://vectorstore.jezweb.com`
 
 ### 🔧 Option 3: Local Development
 
@@ -86,7 +98,7 @@ npm install openai-vector-store-mcp
 
 **Setup**: Clone repository and run locally
 
-## Complete Tool Reference
+## Complete Tool Reference (21 Tools)
 
 ### Core Vector Store Operations
 
@@ -138,16 +150,67 @@ Update vector store name, expiration, or metadata.
 - `expires_after_days` (number, optional): New expiration
 - `metadata` (object, optional): Updated metadata
 
-### File Management Operations
+### 🆕 File Upload & Management Operations (Phase 2)
 
-#### 6. vector-store-file-add
+#### 6. file-upload
+Upload local files directly to OpenAI (CRITICAL - enables end-to-end workflow).
+
+**Parameters**:
+- `file_path` (string, required): Local file path
+- `purpose` (string, optional): File purpose (default: "assistants")
+
+**Example**:
+```json
+{
+  "file_path": "./documents/report.pdf",
+  "purpose": "assistants"
+}
+```
+
+#### 7. file-list
+List all uploaded files with filtering and pagination.
+
+**Parameters**:
+- `limit` (number, optional): Maximum results (default: 20)
+- `purpose` (string, optional): Filter by purpose
+
+#### 8. file-get
+Get detailed information about specific files.
+
+**Parameters**:
+- `file_id` (string, required): OpenAI file ID
+
+#### 9. file-delete
+Remove files from OpenAI storage.
+
+**Parameters**:
+- `file_id` (string, required): OpenAI file ID
+
+#### 10. file-content
+Download and retrieve file content.
+
+**Parameters**:
+- `file_id` (string, required): OpenAI file ID
+
+#### 11. upload-create
+Create multipart uploads for large files (>25MB).
+
+**Parameters**:
+- `filename` (string, required): Name of the file
+- `purpose` (string, required): File purpose
+- `bytes` (number, required): File size in bytes
+- `mime_type` (string, required): MIME type of the file
+
+### Vector Store File Operations
+
+#### 12. vector-store-file-add
 Add an existing file to a vector store.
 
 **Parameters**:
 - `vector_store_id` (string, required): Vector store ID
 - `file_id` (string, required): OpenAI file ID
 
-#### 7. vector-store-file-list
+#### 13. vector-store-file-list
 List all files in a vector store with filtering.
 
 **Parameters**:
@@ -155,21 +218,21 @@ List all files in a vector store with filtering.
 - `limit` (number, optional): Maximum results
 - `filter` (string, optional): Status filter ("in_progress", "completed", "failed", "cancelled")
 
-#### 8. vector-store-file-get
+#### 14. vector-store-file-get
 Get details of a specific file in a vector store.
 
 **Parameters**:
 - `vector_store_id` (string, required): Vector store ID
 - `file_id` (string, required): File ID
 
-#### 9. vector-store-file-content
+#### 15. vector-store-file-content
 Retrieve the content of a file in a vector store.
 
 **Parameters**:
 - `vector_store_id` (string, required): Vector store ID
 - `file_id` (string, required): File ID
 
-#### 10. vector-store-file-update
+#### 16. vector-store-file-update
 Update file metadata.
 
 **Parameters**:
@@ -177,7 +240,7 @@ Update file metadata.
 - `file_id` (string, required): File ID
 - `metadata` (object, required): New metadata
 
-#### 11. vector-store-file-delete
+#### 17. vector-store-file-delete
 Remove a file from a vector store.
 
 **Parameters**:
@@ -186,28 +249,28 @@ Remove a file from a vector store.
 
 ### Batch Operations
 
-#### 12. vector-store-file-batch-create
+#### 18. vector-store-file-batch-create
 Create a batch operation for multiple files.
 
 **Parameters**:
 - `vector_store_id` (string, required): Vector store ID
 - `file_ids` (array, required): Array of file IDs
 
-#### 13. vector-store-file-batch-get
+#### 19. vector-store-file-batch-get
 Get the status of a batch operation.
 
 **Parameters**:
 - `vector_store_id` (string, required): Vector store ID
 - `batch_id` (string, required): Batch ID
 
-#### 14. vector-store-file-batch-cancel
+#### 20. vector-store-file-batch-cancel
 Cancel a running batch operation.
 
 **Parameters**:
 - `vector_store_id` (string, required): Vector store ID
 - `batch_id` (string, required): Batch ID
 
-#### 15. vector-store-file-batch-files
+#### 21. vector-store-file-batch-files
 List files in a batch operation.
 
 **Parameters**:
@@ -244,10 +307,10 @@ List files in a batch operation.
 3. **Install the package**:
    ```bash
    # Global installation (recommended)
-   npm install -g openai-vector-store-mcp
+   npm install -g openai-vector-store-mcp@latest
    
-   # Or use directly with npx
-   npx openai-vector-store-mcp
+   # Or use directly with npx (recommended for latest fixes)
+   npx openai-vector-store-mcp@latest
    ```
 
 4. **Set up API key**:
@@ -274,7 +337,7 @@ List files in a batch operation.
 
 2. **Configure your MCP client** with the Cloudflare Workers URL:
    ```
-   https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE
+   https://vectorstore.jezweb.com/mcp/YOUR_OPENAI_API_KEY_HERE
    ```
 
 ### Local Development Setup
@@ -320,7 +383,7 @@ List files in a batch operation.
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": ["openai-vector-store-mcp"],
+      "args": ["openai-vector-store-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key-here"
       }
@@ -335,7 +398,7 @@ List files in a batch operation.
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": ["openai-vector-store-mcp"],
+      "args": ["openai-vector-store-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key-here"
       }
@@ -350,7 +413,7 @@ List files in a batch operation.
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": ["openai-vector-store-mcp"],
+      "args": ["openai-vector-store-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key-here"
       }
@@ -368,11 +431,62 @@ List files in a batch operation.
       "command": "npx",
       "args": [
         "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+        "https://vectorstore.jezweb.com/mcp/YOUR_OPENAI_API_KEY_HERE"
       ]
     }
   }
 }
+```
+
+### Claude Code CLI Configuration
+
+Claude Code CLI provides excellent performance with direct stdio transport and flexible scoping options.
+
+#### Basic Setup Commands
+
+```bash
+# Add with local scope (default - current project only)
+claude mcp add openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+
+# Add with project scope (shared via .mcp.json)
+claude mcp add --scope project openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+
+# Add with user scope (available across all projects)
+claude mcp add --scope user openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-openai-api-key-here"
+```
+
+#### Project-Level Configuration (.mcp.json)
+
+When using `--scope project`, Claude Code creates a `.mcp.json` file:
+
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": ["openai-vector-store-mcp@latest"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+#### Management Commands
+
+```bash
+# List configured servers
+claude mcp list
+
+# Get server details
+claude mcp get openai-vector-store
+
+# Remove server
+claude mcp remove openai-vector-store
+
+# Check server status in Claude Code
+/mcp
 ```
 
 ### Roo Configuration
@@ -384,7 +498,7 @@ List files in a batch operation.
   "mcpServers": {
     "openai-vector-store": {
       "command": "npx",
-      "args": ["openai-vector-store-mcp"],
+      "args": ["openai-vector-store-mcp@latest"],
       "env": {
         "OPENAI_API_KEY": "your-openai-api-key-here"
       },
@@ -394,6 +508,12 @@ List files in a batch operation.
         "vector-store-get",
         "vector-store-delete",
         "vector-store-modify",
+        "file-upload",
+        "file-list",
+        "file-get",
+        "file-delete",
+        "file-content",
+        "upload-create",
         "vector-store-file-add",
         "vector-store-file-list",
         "vector-store-file-get",
@@ -419,7 +539,7 @@ List files in a batch operation.
       "command": "npx",
       "args": [
         "mcp-proxy",
-        "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_OPENAI_API_KEY_HERE"
+        "https://vectorstore.jezweb.com/mcp/YOUR_OPENAI_API_KEY_HERE"
       ],
       "alwaysAllow": [
         "vector-store-create",
@@ -508,6 +628,114 @@ List files in a batch operation.
 
 #### Managing Batch Operations
 ```
+
+### @latest Package Troubleshooting
+
+#### When to Use @latest
+- **NPM Cache Issues**: When cached versions are outdated despite updates
+- **Version Conflicts**: When pinned versions conflict with dependencies  
+- **Bug Fixes**: To ensure you have the latest bug fixes and security patches
+- **Development**: During active development when frequent updates are expected
+
+#### @latest vs Version Pinning
+
+| Aspect | @latest | Pinned Version |
+|--------|---------|----------------|
+| **Stability** | May introduce breaking changes | Guaranteed consistent behavior |
+| **Bug Fixes** | Always includes latest fixes | May miss critical fixes |
+| **Security** | Latest security patches | May have known vulnerabilities |
+| **Team Sync** | May cause version drift | Everyone uses same version |
+| **Debugging** | Easier to get support | Reproducible issues |
+
+**Recommendation**: Use `@latest` for development and testing, pin versions for production.
+
+#### @latest Installation Issues
+
+```bash
+# Clear NPM cache and install latest
+npm cache clean --force
+npx openai-vector-store-mcp@latest
+
+# Force latest version installation
+npm uninstall -g openai-vector-store-mcp
+npm install -g openai-vector-store-mcp@latest
+
+# Check installed version
+npm list -g openai-vector-store-mcp
+```
+
+### Claude Code CLI Troubleshooting
+
+#### Server Management Issues
+
+**Issue**: Server not found after installation
+```bash
+# Check if server is installed
+claude mcp list
+
+# Reinstall if missing
+claude mcp remove openai-vector-store
+claude mcp add openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-key"
+```
+
+**Issue**: Scope configuration problems
+```bash
+# Check current scope
+claude mcp get openai-vector-store
+
+# Change scope if needed
+claude mcp remove openai-vector-store
+claude mcp add --scope project openai-vector-store -- npx openai-vector-store-mcp@latest --env OPENAI_API_KEY="your-key"
+```
+
+**Issue**: Environment variable not recognized
+```bash
+# Check if environment variable is set
+echo $OPENAI_API_KEY
+
+# Set in shell profile for user scope
+echo 'export OPENAI_API_KEY="your-key"' >> ~/.bashrc
+source ~/.bashrc
+
+# Or use .env file for project scope
+echo "OPENAI_API_KEY=your-key" > .env
+```
+
+#### Project Configuration Issues
+
+**Issue**: .mcp.json file not created
+- Ensure you used `--scope project` when adding the server
+- Check file permissions in project directory
+- Verify Claude Code has write access to project root
+
+**Issue**: Environment variable expansion not working
+```json
+{
+  "mcpServers": {
+    "openai-vector-store": {
+      "command": "npx",
+      "args": ["openai-vector-store-mcp@latest"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY:-your-fallback-key}"
+      }
+    }
+  }
+}
+```
+
+### Client-Specific Troubleshooting Matrix
+
+| Issue | Claude Desktop | Claude Code CLI | Roo |
+|-------|----------------|-----------------|-----|
+| **Server won't start** | Check config.json syntax | `claude mcp get <name>` | Check config.json syntax |
+| **API key errors** | Set OPENAI_API_KEY env var | Use `--env` flag or .env | Set in config env section |
+| **Permission denied** | Check file permissions | Check scope settings | Add to alwaysAllow |
+| **Tool not found** | Restart Claude Desktop | `claude mcp remove && add` | Restart Roo |
+| **Slow performance** | Use @latest version | Use stdio transport | Use stdio transport |
+| **Version conflicts** | Use `npx @latest` | Use `npx @latest` | Use `npx @latest` |
+| **Cache issues** | Clear NPM cache | Clear NPM cache | Clear NPM cache |
+| **Environment vars** | Set in config file | Use --env or .env | Set in config file |
+
 "Cancel the batch operation batch_def456 in vector store vs_abc123"
 ```
 
@@ -579,11 +807,11 @@ export OPENAI_API_KEY="your-key"
 
 **Issue**: "Command not found: openai-vector-store-mcp"
 ```bash
-# Solution: Install the package
-npm install -g openai-vector-store-mcp
+# Solution: Install the package with latest version
+npm install -g openai-vector-store-mcp@latest
 
-# Or use npx directly
-npx openai-vector-store-mcp
+# Or use npx directly (recommended)
+npx openai-vector-store-mcp@latest
 ```
 
 **Issue**: Node.js version compatibility
@@ -601,7 +829,7 @@ nvm use 18
 **Issue**: "Server not found" or "Connection failed"
 ```bash
 # Test server directly
-curl -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 
@@ -630,12 +858,12 @@ npm install -g mcp-proxy
 
 #### NPM Package Debug
 ```bash
-DEBUG=* OPENAI_API_KEY="your-key" npx openai-vector-store-mcp
+DEBUG=* OPENAI_API_KEY="your-key" npx openai-vector-store-mcp@latest
 ```
 
 #### Cloudflare Workers Debug
 ```bash
-curl -v -X POST "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/YOUR_API_KEY" \
+curl -v -X POST "https://vectorstore.jezweb.com/mcp/YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
 ```

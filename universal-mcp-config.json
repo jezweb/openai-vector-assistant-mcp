@@ -10,10 +10,16 @@
       },
       "alwaysAllow": [
         "vector-store-create",
-        "vector-store-list", 
+        "vector-store-list",
         "vector-store-get",
         "vector-store-delete",
         "vector-store-modify",
+        "file-upload",
+        "file-list",
+        "file-get",
+        "file-delete",
+        "file-content",
+        "upload-create",
         "vector-store-file-add",
         "vector-store-file-list",
         "vector-store-file-get",
@@ -29,7 +35,7 @@
   },
   "_metadata": {
     "description": "Universal MCP server configuration compatible with any MCP client",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "created": "2025-07-29",
     "features": [
       "Proper JSON-RPC 2.0 formatting with UTF-8 encoding",
@@ -57,8 +63,8 @@
     },
     "fallback_transport": {
       "description": "SSE transport configuration as alternative",
-      "sse_endpoint": "https://mcp-server-cloudflare.webfonts.workers.dev/mcp/sse",
-      "proxy_command": "npx mcp-proxy https://mcp-server-cloudflare.webfonts.workers.dev/mcp/sse"
+      "sse_endpoint": "https://vectorstore.jezweb.com/mcp/sse",
+      "proxy_command": "npx mcp-proxy https://vectorstore.jezweb.com/mcp/sse"
     }
   }
 }

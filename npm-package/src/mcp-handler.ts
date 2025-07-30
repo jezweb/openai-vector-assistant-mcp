@@ -23,7 +23,7 @@ import { OpenAIService } from './openai-service.js';
 export class MCPHandler {
   private openaiService: OpenAIService | null = null;
   private isProxyMode: boolean = false;
-  private cloudflareWorkerUrl: string = 'https://mcp-server-cloudflare.webfonts.workers.dev/mcp';
+  private cloudflareWorkerUrl: string = 'https://vectorstore.jezweb.com/mcp';
 
   constructor(apiKey: string) {
     if (apiKey === 'CLOUDFLARE_PROXY_MODE') {
@@ -35,7 +35,7 @@ export class MCPHandler {
       if (apiKey.startsWith('sk-')) {
         // Use Cloudflare Worker with API key in URL
         this.isProxyMode = true;
-        this.cloudflareWorkerUrl = `https://mcp-server-cloudflare.webfonts.workers.dev/mcp/${apiKey}`;
+        this.cloudflareWorkerUrl = `https://vectorstore.jezweb.com/mcp/${apiKey}`;
       } else {
         // Direct OpenAI service (for local development)
         this.openaiService = new OpenAIService(apiKey);

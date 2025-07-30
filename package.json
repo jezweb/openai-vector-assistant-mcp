@@ -1,7 +1,7 @@
 {
   "name": "universal-openai-vector-store-mcp",
-  "version": "1.1.0",
-  "description": "Universal OpenAI Vector Store MCP Server - Deploy via Cloudflare Workers, NPM package, or local development. Complete 15-tool coverage with enhanced Roo compatibility.",
+  "version": "1.2.0",
+  "description": "Universal OpenAI Vector Store MCP Server - Deploy via Cloudflare Workers, NPM package, or local development. Complete 21-tool coverage with file management capabilities and enhanced Roo compatibility.",
   "main": "dist/worker.js",
   "type": "module",
   "scripts": {
